@@ -45,6 +45,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { login as mockLogin } from '@/services/auth'   // ✅ 목업 검증 함수
 
 const router = useRouter()
 const route = useRoute()
@@ -52,17 +53,24 @@ const route = useRoute()
 const id = ref('')
 const pw = ref('')
 
-function login() {
+async function login() {
   if (!id.value || !pw.value) {
     alert('아이디/비밀번호를 입력하세요.')
     return
   }
-  // TODO: 실제 API 연동
-  localStorage.setItem('auth_token', 'dummy-token')
-  const redirect = (route.query.redirect as string) || '/home'
-  router.push(redirect)
+  try {
+    // ✅ 존재하는 아이디/비밀번호일 때만 통과 (auth.ts의 mock 목록 기준)
+    mockLogin(id.value, pw.value)
+
+    const redirect = (route.query.redirect as string) || '/home'
+    router.push(redirect)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : '로그인 실패'
+    alert(msg)   // ❌ 틀리면 여기서 막혀서 메인으로 안 감
+  }
 }
 
+// 👉 카카오/구글 버튼은 그대로 유지(나중에 SDK 연결만 추가)
 function kakaoLogin() {
   alert('카카오 로그인 SDK 연동 예정')
 }
@@ -70,6 +78,7 @@ function googleLogin() {
   alert('Google 로그인 SDK 연동 예정')
 }
 </script>
+
 
 <style scoped>
 .auth-wrap {
