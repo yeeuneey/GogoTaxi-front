@@ -8,9 +8,9 @@ import FindAccount from '@/pages/Auth/FindAccount.vue'
 
 const routes = [
  { path: '/', redirect: '/login' },
-  { path: '/login', name: 'login', component: UserLogin },
-  { path: '/register', name: 'register', component: UserRegister },
-  { path: '/find-account', name: 'find-account', component: FindAccount },
+  { path: '/login', name: 'login', component: UserLogin, meta: { hideBottomNav: true } },
+  { path: '/register', name: 'register', component: UserRegister, meta: { hideBottomNav: true } },
+  { path: '/find-account', name: 'find-account', component: FindAccount, meta: { hideBottomNav: true } },
 
   { path: '/home', name: 'home', component: MainPage, meta: { requiresAuth: true } },
   { path: '/find-room', name: 'find-room', component: () => import('@/pages/Stub/FindRoom.vue'), meta: { requiresAuth: true } },
