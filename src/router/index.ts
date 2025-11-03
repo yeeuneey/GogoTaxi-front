@@ -2,21 +2,23 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // 각 페이지 import
 import MainPage from '@/pages/Home/MainPage.vue'
-import FindRoom from '@/pages/Stub/FindRoom.vue'
-import MyRooms from '@/pages/Stub/MyRooms.vue'
-import MyPage from '@/pages/Stub/MyPage.vue'
-import NoticeList from '@/pages/Home/Notice/NoticeList.vue'
-import PaymentMethods from '@/pages/Payments/PaymentMethods.vue'
+import UserLogin from '@/pages/Auth/UserLogin.vue'
+import UserRegister from '@/pages/Auth/UserRegister.vue'
+import FindAccount from '@/pages/Auth/FindAccount.vue'
 
 const routes = [
-  { path: '/', name: 'home', component: MainPage },
-  { path: '/find-room', name: 'find-room', component: FindRoom },
-  { path: '/my-rooms', name: 'my-rooms', component: MyRooms },
-  { path: '/mypage', name: 'mypage', component: MyPage },
-  { path: '/notice', name: 'notice', component: NoticeList },
-  { path: '/payment-methods', name: 'payment-methods', component: PaymentMethods },
-]
+ { path: '/', redirect: '/login' },
+  { path: '/login', name: 'login', component: UserLogin },
+  { path: '/register', name: 'register', component: UserRegister },
+  { path: '/find-account', name: 'find-account', component: FindAccount },
 
+  { path: '/home', name: 'home', component: MainPage, meta: { requiresAuth: true } },
+  { path: '/find-room', name: 'find-room', component: () => import('@/pages/Stub/FindRoom.vue'), meta: { requiresAuth: true } },
+  { path: '/my-rooms', name: 'my-rooms', component: () => import('@/pages/Stub/MyRooms.vue'), meta: { requiresAuth: true } },
+  { path: '/mypage', name: 'mypage', component: () => import('@/pages/Stub/MyPage.vue'), meta: { requiresAuth: true } },
+  { path: '/notice', name: 'notice', component: () => import('@/pages/Home/Notice/NoticeList.vue'), meta: { requiresAuth: true } },
+  { path: '/payment-methods', name: 'payment-methods', component: () => import('@/pages/Payments/PaymentMethods.vue'), meta: { requiresAuth: true } },
+]
 const router = createRouter({
   history: createWebHistory(),
   routes,
