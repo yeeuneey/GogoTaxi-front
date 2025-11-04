@@ -1,47 +1,45 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div id="app" class="app-shell">
+    <AppHeader />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
+    <main
+      class="app-content"
+      :style="hideBottomTab
+        ? { paddingBottom: '0', minHeight: 'calc(100vh - var(--header-h))' }
+        : {}"
+    >
+      <router-view />
+    </main>
 
-  <main>
-    <TheWelcome />
-  </main>
+    <BottomTab v-if="!hideBottomTab" />
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import AppHeader from '@/components/AppHeader.vue'
+import BottomTab from '@/components/BottomTab.vue'
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+const route = useRoute()
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+// 로그인/회원가입/비번찾기 같은 페이지에서 탭 숨기고 싶으면 meta로 제어하는 게 가장 유연함
+const hideBottomTab = computed(() => {
+  // 1) 라우트 이름으로 간단히: return route.name === 'login'
+  // 2) meta로 더 확장 가능:
+  return Boolean(route.meta?.hideBottomNav)
+})
+</script>
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+<style>
+:root { --header-h: 56px; --tab-h: 64px; }
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.app-shell { position: relative; min-height: 100%; background: #fff; }
+.app-content {
+  padding-top: var(--header-h);
+  padding-bottom: var(--tab-h); /* 기본값(탭 보일 때) */
+  min-height: calc(100vh - var(--header-h) - var(--tab-h));
 }
 </style>
