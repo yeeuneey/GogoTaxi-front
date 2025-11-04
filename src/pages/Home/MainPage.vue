@@ -2,129 +2,224 @@
 <template>
   <section class="main">
     <div class="hero">
-      <svg
-        class="forest-bg"
-        viewBox="0 0 360 720"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="forest-base" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#0f3316" />
-            <stop offset="35%" stop-color="#1c4a1f" />
-            <stop offset="100%" stop-color="#2e612b" />
-          </linearGradient>
-          <linearGradient id="forest-light" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="rgba(255,255,230,0.55)" />
-            <stop offset="45%" stop-color="rgba(255,255,230,0.2)" />
-            <stop offset="100%" stop-color="rgba(255,255,230,0)" />
-          </linearGradient>
-          <linearGradient id="path-base" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#b7733d" />
-            <stop offset="45%" stop-color="#8d5529" />
-            <stop offset="100%" stop-color="#5d3b1e" />
-          </linearGradient>
-          <linearGradient id="path-inner" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f1c58b" stop-opacity="0.85" />
-            <stop offset="70%" stop-color="rgba(255,239,210,0.25)" />
-            <stop offset="100%" stop-color="rgba(255,239,210,0)" />
-          </linearGradient>
-          <filter id="grainy">
-            <feTurbulence baseFrequency="0.8" numOctaves="2" type="fractalNoise" />
-            <feColorMatrix type="saturate" values="0" />
-            <feComponentTransfer>
-              <feFuncA type="table" tableValues="0 0 0.04 0" />
-            </feComponentTransfer>
-          </filter>
-        </defs>
+      <div class="map-board">
+        <div class="board-header">
+          <h2>꼬꼬택 주요 메뉴</h2>
+          <p>GogoTaxi Main Menu Guide</p>
+        </div>
+        <div class="board-body">
+          <svg
+            class="map-svg"
+            viewBox="0 0 800 520"
+            aria-hidden="true"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+          >
+            <defs>
+              <linearGradient id="map-land" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#c6eb9e" />
+                <stop offset="40%" stop-color="#9cd976" />
+                <stop offset="100%" stop-color="#66c166" />
+              </linearGradient>
+              <linearGradient id="map-shadow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(31, 63, 36, 0.45)" />
+                <stop offset="60%" stop-color="rgba(31, 63, 36, 0)" />
+              </linearGradient>
+              <radialGradient id="map-water" cx="0.5" cy="0.5" r="0.7">
+                <stop offset="0%" stop-color="#8de6ff" />
+                <stop offset="100%" stop-color="#3aa1d3" />
+              </radialGradient>
+            </defs>
 
-        <rect width="360" height="720" fill="url(#forest-base)" />
-        <rect width="360" height="720" fill="url(#forest-light)" />
+            <rect width="800" height="520" fill="#f9f6eb" rx="40" ry="40" />
 
-        <path
-          d="
-            M 110 740
-            C 30 610 250 540 150 420
-            C 60 320 270 300 200 200
-            C 140 120 250 100 210 20
-            C 190 -20 170 -40 185 -60
-            L 255 -60
-            C 230 -10 280 30 275 120
-            C 270 210 160 250 225 350
-            C 290 450 180 520 250 650
-            C 265 680 260 710 255 740
-            Z"
-          fill="url(#path-base)"
-        />
+            <g class="map-illustration" transform="translate(-20 -85) scale(1.08)">
+              <path
+                class="map-land"
+                d="
+                  M 120 470
+                  C 70 380 90 270 210 220
+                  C 260 200 250 150 320 120
+                  C 410 80 520 120 600 180
+                  C 705 260 720 340 670 400
+                  C 628 450 572 478 530 508
+                  C 470 550 390 538 315 540
+                  C 230 542 170 530 120 470
+                  Z
+                "
+              />
+              <path
+                class="map-shadow"
+                d="
+                  M 150 500
+                  C 120 420 160 340 250 300
+                  C 310 270 310 220 360 200
+                  C 430 170 500 200 550 240
+                  C 620 295 640 350 610 395
+                  C 570 455 480 470 430 500
+                  C 360 540 250 540 180 520
+                  Z
+                "
+              />
 
-        <path
-          d="
-            M 150 730
-            C 80 610 220 560 140 430
-            C 80 330 240 290 185 210
-            C 140 140 220 110 200 40
-            C 190 0 190 -20 200 -40
-            L 225 -40
-            C 210 20 255 70 250 140
-            C 245 220 155 250 215 340
-            C 275 430 185 500 240 610
-            C 255 640 245 700 240 730
-            Z"
-          fill="url(#path-inner)"
-        />
+              <path
+                class="map-border"
+                d="
+                  M 120 470
+                  C 70 380 90 270 210 220
+                  C 260 200 250 150 320 120
+                  C 410 80 520 120 600 180
+                  C 705 260 720 340 670 400
+                  C 628 450 572 478 530 508
+                  C 470 550 390 538 315 540
+                  C 230 542 170 530 120 470
+                "
+              />
 
-        <path
-          d="
-            M 115 735
-            C 35 610 245 545 155 420
-            C 70 300 260 300 195 205
-            C 130 115 250 105 205 15"
-          fill="none"
-          stroke="rgba(255,255,255,0.35)"
-          stroke-width="18"
-          stroke-linecap="round"
-        />
-        <path
-          d="
-            M 245 15
-            C 220 80 285 140 270 230
-            C 255 320 165 360 220 445
-            C 275 530 190 580 260 700"
-          fill="none"
-          stroke="rgba(0,0,0,0.16)"
-          stroke-width="18"
-          stroke-linecap="round"
-        />
+              <path
+                class="map-trail"
+                d="
+                  M 165 440
+                  C 210 400 225 350 280 310
+                  C 330 275 340 230 380 210
+                  C 420 190 465 215 495 240
+                  C 530 268 565 260 600 230
+                  C 625 208 642 212 645 238
+                  C 650 280 610 320 575 345
+                  C 530 380 515 400 500 430
+                  C 475 480 410 490 350 480
+                  C 305 472 255 480 210 470
+                  C 190 465 175 456 165 440
+                "
+              />
 
-        <rect width="360" height="720" filter="url(#grainy)" />
-      </svg>
+              <path
+                class="map-trail map-trail--secondary"
+                d="
+                  M 250 320
+                  C 300 320 320 360 360 360
+                  C 420 360 440 320 490 320
+                  C 530 320 560 350 560 380
+                "
+              />
 
-      <button class="path-pin pin-make" @click="goCreate" aria-label="방 만들기">
-        <img :src="logoMake" alt="" />
-        <span>방 만들기</span>
-      </button>
-      <button class="path-pin pin-find" @click="goSearch" aria-label="방 찾기">
-        <img :src="logoFind" alt="" />
-        <span>방 찾기</span>
-      </button>
-      <button
-        class="path-pin pin-myrooms path-pin--cutout"
-        @click="goMyRooms"
-        aria-label="나의 방"
-      >
-        <img :src="logoMy" alt="" />
-        <span>나의 방</span>
-      </button>
-      <div class="info-panel">
-        <BlockRow title="공지" subtitle="새 소식과 안내" icon="📢" @click="goNotice" />
-        <BlockRow title="결제 수단" subtitle="카드 / 계좌 관리" icon="💳" @click="goPayment" />
+              <ellipse class="map-water" cx="520" cy="220" rx="58" ry="34" />
+              <ellipse class="map-water" cx="265" cy="260" rx="32" ry="20" />
+
+              <rect class="map-building" x="360" y="280" width="40" height="26" rx="6" />
+              <rect class="map-building" x="455" y="340" width="42" height="28" rx="6" />
+              <rect class="map-building" x="305" y="365" width="32" height="24" rx="6" />
+
+              <g
+                class="menu-point menu-point--make"
+                role="button"
+                tabindex="0"
+                aria-label="방 만들기 바로가기"
+                @click="goCreate"
+                @keydown.enter.prevent="goCreate"
+                @keydown.space.prevent="goCreate"
+              >
+                <image
+                  :href="logoMake"
+                  :xlink:href="logoMake"
+                  x="188"
+                  y="278"
+                  width="92"
+                  height="92"
+                  class="menu-logo"
+                />
+              </g>
+              <g
+                class="menu-point menu-point--find"
+                role="button"
+                tabindex="0"
+                aria-label="방 찾기 바로가기"
+                @click="goSearch"
+                @keydown.enter.prevent="goSearch"
+                @keydown.space.prevent="goSearch"
+              >
+                <image
+                  :href="logoFind"
+                  :xlink:href="logoFind"
+                  x="431"
+                  y="216"
+                  width="92"
+                  height="92"
+                  class="menu-logo"
+                />
+              </g>
+              <g
+                class="menu-point menu-point--my"
+                role="button"
+                tabindex="0"
+                aria-label="나의 방 바로가기"
+                @click="goMyRooms"
+                @keydown.enter.prevent="goMyRooms"
+                @keydown.space.prevent="goMyRooms"
+              >
+                <image
+                  :href="logoMy"
+                  :xlink:href="logoMy"
+                  x="270"
+                  y="365"
+                  width="120"
+                  height="120"
+                  class="menu-logo"
+                />
+              </g>
+            </g>
+          </svg>
+        </div>
+        <ul class="legend legend--menus">
+          <li>
+            <img :src="logoMake" alt="방 만들기" class="legend-logo legend-logo--make" />
+            <span>방 만들기</span>
+          </li>
+          <li>
+            <img :src="logoFind" alt="방 찾기" class="legend-logo legend-logo--find" />
+            <span>방 찾기</span>
+          </li>
+          <li>
+            <img :src="logoMy" alt="나의 방" class="legend-logo legend-logo--my" />
+            <span>나의 방</span>
+          </li>
+        </ul>
       </div>
+
+      <section class="gateway">
+      <header class="gateway-header">
+        <h3>서비스 바로가기</h3>
+        <p>업데이트된 공지와 결제 관리를 빠르게 확인해 보세요.</p>
+      </header>
+      <div class="gateway-grid">
+        <article class="gateway-card gateway-card--notice">
+          <div class="card-body">
+            <h4>공지사항 센터</h4>
+            <p>운영팀에서 전하는 최신 소식, 서비스 공지, 점검 안내를 한곳에서 확인할 수 있어요.</p>
+          </div>
+          <footer>
+            <button class="card-btn" type="button" @click="goNotice">
+              공지사항 바로가기
+            </button>
+          </footer>
+        </article>
+        <article class="gateway-card gateway-card--payment">
+          <div class="card-body">
+            <h4>결제 수단 관리</h4>
+            <p>등록된 카드와 계좌를 손쉽게 관리하고, 결제 이력을 확인할 수 있도록 준비 중이에요.</p>
+          </div>
+          <footer>
+            <button class="card-btn" type="button" @click="goPayment">
+              결제 관리 준비 알림
+            </button>
+          </footer>
+        </article>
+      </div>
+      </section>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 
 import logoMake from '@/assets/logo_make.png'
@@ -148,177 +243,300 @@ function goNotice() {
 function goPayment() {
   router.push({ name: 'payment-methods' })
 }
-
-const BlockRow = defineComponent({
-  props: { title: String, subtitle: String, icon: String },
-  emits: ['click'],
-  template: `
-    <div class="block-row" @click="$emit('click')">
-      <div class="ic">{{ icon }}</div>
-      <div class="txt">
-        <div class="title">{{ title }}</div>
-        <div class="sub">{{ subtitle }}</div>
-      </div>
-      <div class="chev">›</div>
-    </div>
-  `,
-})
 </script>
 
 <style scoped>
+
 .main {
   min-height: calc(100dvh - var(--tab-h));
   padding-bottom: var(--tab-h);
+  background: linear-gradient(180deg, #3c2919 0%, #3c2919 60vh, #f6f2e8 100%);
 }
 
 .hero {
   position: relative;
   width: 100%;
-  min-height: clamp(1100px, 165dvh, 1800px);
-  padding-bottom: clamp(180px, 12vh, 260px);
+  min-height: clamp(1000px, 150dvh, 1700px);
+  padding: clamp(100px, 14vh, 180px) 0 clamp(220px, 14vh, 320px);
   overflow: hidden;
-  border-bottom-left-radius: 50% 6%;
-  border-bottom-right-radius: 50% 6%;
-  box-shadow: inset 0 -80px 140px rgba(0, 0, 0, 0.4);
+  background:
+    linear-gradient(180deg, rgba(58, 41, 25, 0.95) 0%, rgba(45, 29, 17, 0.95) 62%, #372112 100%),
+    url('@/assets/path-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-.forest-bg {
+.hero::before {
+  content: '';
   position: absolute;
   inset: 0;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 243, 210, 0.18), transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(255, 240, 200, 0.16), transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(0, 0, 0, 0.35), transparent 70%);
+  pointer-events: none;
+}
+
+.map-board {
+  position: relative;
+  width: min(92%, 980px);
+  display: grid;
+  gap: clamp(16px, 3vw, 28px);
+  padding: clamp(20px, 3.6vw, 32px);
+  border-radius: 36px;
+  background: linear-gradient(145deg, #faf7ec 0%, #f2ede0 50%, #e7decd 100%);
+  border: 1px solid rgba(92, 64, 36, 0.22);
+  box-shadow: 0 48px 90px rgba(8, 6, 3, 0.45);
+  z-index: 0;
+  margin-bottom: clamp(48px, 8vh, 90px);
+}
+.map-board::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+.board-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  color: #3b352c;
+}
+.board-header h2 {
+  margin: 0;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 700;
+}
+.board-header p {
+  margin: 0;
+  font-size: clamp(12px, 2vw, 14px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(59, 53, 44, 0.7);
+}
+.board-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 800 / 520;
+  border-radius: 28px;
+  overflow: visible;
+  box-shadow: inset 0 0 0 1px rgba(60, 45, 28, 0.12);
+}
+.map-svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.path-pin {
-  position: absolute;
-  transform: translate(-50%, -50%);
+.map-land {
+  fill: url(#map-land);
+  stroke: rgba(64, 108, 55, 0.3);
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+.map-shadow {
+  fill: url(#map-shadow);
+}
+.map-border {
+  fill: none;
+  stroke: rgba(38, 72, 39, 0.35);
+  stroke-width: 10;
+  stroke-linejoin: round;
+}
+.map-trail {
+  fill: none;
+  stroke: #f6f2e8;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
+}
+.map-trail--secondary {
+  stroke: #ffe8a3;
+  stroke-width: 6;
+  stroke-dasharray: 14 12;
+  filter: none;
+}
+.map-water {
+  fill: url(#map-water);
+  stroke: #4fa1c7;
+  stroke-width: 4;
+  opacity: 0.9;
+}
+.map-building {
+  fill: #fdf1c2;
+  stroke: #bd8a27;
+  stroke-width: 3;
+}
+.menu-point {
+  cursor: pointer;
+}
+.menu-logo {
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.menu-point:hover .menu-logo {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 22px 32px rgba(0, 0, 0, 0.4));
+}
+.menu-point:focus-visible .menu-logo {
+  transform: translateY(-4px) scale(1.02);
+  filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.45));
+}
+
+.legend {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #4a4339;
+}
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 18px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(2px);
+}
+.legend-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+.legend--menus span:last-child {
+  font-weight: 600;
+  color: #3b342c;
+}
+
+.gateway {
+  width: min(96%, 980px);
+  margin: clamp(24px, 4vh, 48px) auto 0;
+  padding: 0 clamp(18px, 6vw, 32px);
+  display: grid;
+  gap: clamp(20px, 3vw, 28px);
+}
+.gateway-header {
+  text-align: center;
+  color: #f8f4ec;
+}
+.gateway-header h3 {
+  margin: 0 0 8px;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 700;
+}
+.gateway-header p {
+  margin: 0;
+  font-size: clamp(13px, 3vw, 15px);
+  color: rgba(255, 244, 220, 0.75);
+}
+.gateway-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(18px, 3vw, 26px);
+}
+.gateway-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  z-index: 1;
+  gap: 22px;
+  padding: clamp(22px, 4vw, 30px);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(120, 92, 68, 0.14);
+  box-shadow: 0 24px 48px rgba(20, 12, 6, 0.25);
+  backdrop-filter: blur(8px);
+  transform: translateY(0);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
-
-.path-pin img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  background: transparent;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-  border-radius: 26px;
-  padding: 6px;
+.gateway-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 32px 58px rgba(20, 12, 6, 0.28);
 }
-
-.path-pin span {
-  font-weight: 700;
-  font-size: 15px;
-  color: #111;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.85);
-}
-
-.path-pin--cutout img {
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-}
-
-.pin-make {
-  left: 20%;
-  top: 30%;
-}
-.pin-find {
-  left: 76%;
-  top: 20%;
-}
-.pin-myrooms {
-  left: 18%;
-  top: 44%;
-}
-
-@media (min-width: 769px) {
-  .path-pin img {
-    width: 140px;
-    height: 140px;
-  }
-  .pin-make {
-    left: 26%;
-    top: 32%;
-  }
-  .pin-find {
-    left: 72%;
-    top: 20%;
-  }
-  .pin-myrooms {
-    left: 24%;
-    top: 46%;
-  }
-}
-
-@media (max-width: 520px) {
-  .path-pin {
-    transform: translate(-50%, -30%);
-  }
-  .pin-make {
-    left: 45%;
-    top: 22%;
-  }
-  .pin-find {
-    left: 55%;
-    top: 36%;
-  }
-  .pin-myrooms {
-    left: 45%;
-    top: 56%;
-  }
-}
-
-.info-panel {
+.gateway-card::after {
+  content: '';
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(32px, 8vh, 120px);
-  width: min(90%, 960px);
-  display: grid;
-  gap: 12px;
+  inset: 0;
+  border-radius: 24px;
+  background: var(--card-accent, transparent);
+  opacity: 0.18;
+  pointer-events: none;
 }
-@media (max-width: 520px) {
+.gateway-card--notice {
+  --card-accent: linear-gradient(135deg, rgba(255, 173, 100, 0.4), rgba(255, 212, 150, 0.2));
+}
+.gateway-card--payment {
+  --card-accent: linear-gradient(135deg, rgba(126, 192, 255, 0.4), rgba(167, 219, 255, 0.2));
+}
+.gateway-card h4 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #2f241b;
+}
+.gateway-card p {
+  margin: 0;
+  line-height: 1.6;
+  color: #6d6257;
+  font-size: 14px;
+}
+.card-btn {
+  align-self: flex-start;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #2f241b;
+  color: #fff6e8;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(20, 12, 6, 0.25);
+  background: #433323;
+}
+
+@media (max-width: 820px) {
+  .map-board {
+    margin-bottom: clamp(32px, 6vh, 70px);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding-bottom: 240px;
+  }
+  .map-board {
+    gap: 14px;
+    padding: 18px;
+    border-radius: 26px;
+  }
+  .map-board::after {
+    inset: 10px;
+    border-radius: 20px;
+  }
+  .board-body {
+    border-radius: 20px;
+  }
   .info-panel {
     width: calc(100% - 32px);
   }
-}
-.block-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 14px;
-  padding: 14px 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-.block-row .ic {
-  font-size: 20px;
-}
-.block-row .txt {
-  flex: 1;
-}
-.block-row .title {
-  font-weight: 700;
-  color: #111;
-}
-.block-row .sub {
-  color: #666;
-  font-size: 12px;
-}
-.block-row .chev {
-  font-size: 18px;
-  color: #bbb;
 }
 </style>

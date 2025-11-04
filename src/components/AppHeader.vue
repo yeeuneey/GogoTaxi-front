@@ -2,21 +2,11 @@
   <header class="header">
     <div class="header-inner">
       <img class="logo" src="@/assets/logo.png" alt="GogoTaxi" />
-      <button type="button" class="logout-btn" @click="handleLogout">로그아웃</button>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { logout } from '@/services/auth'
-
-const router = useRouter()
-
-function handleLogout() {
-  logout()
-  router.push({ name: 'login' })
-}
 </script>
 
 <style scoped>
@@ -41,21 +31,5 @@ function handleLogout() {
 .logo {
   height: 46px;
   object-fit: contain;
-}
-.logout-btn {
-  position: absolute;
-  right: 16px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  color: #6a4b00;
-  background: #ffe27a;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
-}
-.logout-btn:active {
-  transform: translateY(1px);
 }
 </style>

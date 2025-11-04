@@ -19,6 +19,7 @@ const routes = [
   { path: '/my-rooms', name: 'my-rooms', component: () => import('@/pages/Stub/MyRooms.vue'), meta: { requiresAuth: true } },
   { path: '/mypage', name: 'mypage', component: () => import('@/pages/Stub/MyPage.vue'), meta: { requiresAuth: true } },
   { path: '/notice', name: 'notice', component: () => import('@/pages/Home/Notice/NoticeList.vue'), meta: { requiresAuth: true } },
+  { path: '/notice/:id', name: 'notice-detail', component: () => import('@/pages/Home/Notice/NoticeDetail.vue'), meta: { requiresAuth: true } },
   { path: '/payment-methods', name: 'payment-methods', component: () => import('@/pages/Payments/PaymentMethods.vue'), meta: { requiresAuth: true } },
 ]
 const router = createRouter({
