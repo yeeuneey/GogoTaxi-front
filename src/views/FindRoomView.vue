@@ -227,10 +227,6 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 
-.sheet--expanded {
-  border-radius: 0;
-}
-
 .sheet--dragging {
   transition: none;
 }
