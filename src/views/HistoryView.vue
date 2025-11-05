@@ -93,7 +93,7 @@ const goBack = () => {
 };
 
 const goToReview = (rideId: number) => {
-  router.push({ name: "RideReview", params: { rideId } }).catch((error) => {
+  router.push({ name: "ride-review", query: { rideId } }).catch((error) => {
     console.warn("리뷰 페이지 이동 중 오류", error);
   });
 };

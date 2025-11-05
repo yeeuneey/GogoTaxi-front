@@ -319,7 +319,7 @@ const cancelLogout = () => {
 const confirmLogout = () => {
   showLogoutConfirm.value = false;
   // TODO: 실제 로그아웃 API 연동
-  router.push({ name: "UserLogin" }).catch((error) => {
+  router.push({ name: "login" }).catch((error) => {
     console.warn("로그아웃 후 이동 중 오류", error);
   });
 };
