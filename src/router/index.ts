@@ -37,6 +37,18 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/mypage/settings",
+    name: "ProfileSettings",
+    component: () => import('@/views/ProfileSettingsView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/mypage/history",
+    name: "History",
+    component: () => import('@/views/HistoryView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/notice',
     name: 'notice',
     component: () => import('@/views/NoticeListView.vue'),

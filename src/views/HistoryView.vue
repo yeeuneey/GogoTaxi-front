@@ -64,10 +64,10 @@ const router = useRouter();
 const rides = [
   {
     id: 1,
-    date: "25.10.26 (일)",
+    date: "25.xx.xx (월)",
     time: "13:21 - 13:29",
-    origin: "한빛카센터",
-    destination: "마래당",
+    origin: "출발지",
+    destination: "도착지",
     fare: "5,700원",
   },
   {
