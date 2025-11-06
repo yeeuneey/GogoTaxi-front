@@ -189,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import arrowBackIcon from '@/assets/arrowback.png'
 
@@ -297,6 +297,33 @@ const newCard = reactive({
   isCorporate: false,
 })
 const cardFormError = ref('')
+
+watch(
+  () => newCard.number,
+  (value) => {
+    const digits = value.replace(/\D/g, '').slice(0, 16)
+    const formatted = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+    if (formatted !== value.trim()) {
+      newCard.number = formatted
+    }
+  },
+)
+
+watch(
+  () => newCard.expiry,
+  (value) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4)
+    let formatted = digits
+    if (digits.length >= 3) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`
+    } else if (digits.length >= 1 && digits.length <= 2) {
+      formatted = digits
+    }
+    if (formatted !== value) {
+      newCard.expiry = formatted
+    }
+  },
+)
 
 const goBack = () => router.back()
 
