@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { RoomPreview } from '@/types/rooms'
+import { loadKakaoMaps } from '@/services/kakaoMaps'
 
 type KakaoNamespace = typeof window.kakao
 
@@ -109,50 +110,8 @@ function initializeMap(kakao: KakaoNamespace) {
   updateMarkers()
 }
 
-let loaderPromise: Promise<KakaoNamespace | null> | null = null
-
-function loadKakaoApi(): Promise<KakaoNamespace | null> {
-  if (loaderPromise) return loaderPromise
-  loaderPromise = new Promise(resolve => {
-    if (typeof window === 'undefined') {
-      setError('브라우저 환경에서만 지도를 사용할 수 있습니다.')
-      resolve(null)
-      return
-    }
-    if (window.kakao?.maps) {
-      resolve(window.kakao as KakaoNamespace)
-      return
-    }
-
-    const appKey = import.meta.env.VITE_KAKAO_JS_KEY
-    if (!appKey) {
-      setError('VITE_KAKAO_JS_KEY 값을 찾을 수 없습니다.')
-      resolve(null)
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false`
-    script.async = true
-    script.onload = () => {
-      if (!window.kakao?.maps) {
-        setError('카카오 지도 SDK가 정상적으로 로드되지 않았습니다.')
-        resolve(null)
-        return
-      }
-      window.kakao.maps.load(() => resolve(window.kakao as KakaoNamespace))
-    }
-    script.onerror = event => {
-      setError('카카오 지도 SDK 로드 중 오류가 발생했습니다.', event)
-      resolve(null)
-    }
-    document.head.appendChild(script)
-  })
-  return loaderPromise
-}
-
 onMounted(async () => {
-  const kakao = await loadKakaoApi()
+  const kakao = await loadKakaoMaps()
   if (kakao) {
     initializeMap(kakao)
   } else {
