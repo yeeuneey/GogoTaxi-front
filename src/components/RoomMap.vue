@@ -29,9 +29,9 @@ const errorMessage = ref<string | null>(null)
 const canvas = ref<HTMLDivElement>()
 
 let kakaoApi: KakaoNamespace | null = null
-let map: any = null
-const listMarkers: any[] = []
-const selectedMarkers: any[] = []
+let map: kakao.maps.Map | null = null
+const listMarkers: kakao.maps.Marker[] = []
+const selectedMarkers: kakao.maps.Marker[] = []
 
 const hasSelection = computed(() => Boolean(props.selectedRoom))
 
@@ -42,7 +42,7 @@ function setError(message: string, detail?: unknown) {
   console.error('[RoomMap]', message, detail)
 }
 
-function clearMarkers(collection: any[]) {
+function clearMarkers(collection: kakao.maps.Marker[]) {
   collection.forEach(marker => marker.setMap(null))
   collection.splice(0, collection.length)
 }
@@ -112,11 +112,11 @@ function initializeMap(kakao: KakaoNamespace) {
 
 onMounted(async () => {
   const kakao = await loadKakaoMaps()
-  if (kakao) {
-    initializeMap(kakao)
-  } else {
-    ready.value = false
+  if (!kakao) {
+    setError('카카오 지도 SDK를 불러오지 못했습니다.')
+    return
   }
+  initializeMap(kakao)
 })
 
 watch(
