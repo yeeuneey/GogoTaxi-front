@@ -120,7 +120,7 @@ function submit() {
 
 <style scoped>
 .auth-wrap {
-  min-height: calc(100vh - var(--tab-h, 64px));
+  min-height: calc(100vh - var(--header-h, 56px));
   display: grid;
   place-items: start center;
   padding: 32px 16px;

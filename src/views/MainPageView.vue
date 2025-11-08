@@ -49,7 +49,7 @@
               </radialGradient>
             </defs>
 
-            <rect width="800" height="520" fill="#f9f6eb" rx="40" ry="40" />
+            <rect width="800" height="520" fill="none" rx="40" ry="40" />
 
             <g class="map-illustration" transform="translate(-20 -85) scale(1.08)">
               <path
@@ -123,10 +123,6 @@
 
               <ellipse class="map-water" cx="520" cy="220" rx="58" ry="34" />
               <ellipse class="map-water" cx="265" cy="260" rx="32" ry="20" />
-
-              <rect class="map-building" x="360" y="280" width="40" height="26" rx="6" />
-              <rect class="map-building" x="455" y="340" width="42" height="28" rx="6" />
-              <rect class="map-building" x="305" y="365" width="32" height="24" rx="6" />
 
               <g
                 class="menu-point menu-point--make"
@@ -282,8 +278,8 @@ function goLatestNotice() {
 
 .main {
   min-height: calc(100dvh - var(--tab-h));
-  padding-bottom: var(--tab-h);
-  background: linear-gradient(180deg, #3c2919 0%, #3c2919 60vh, #f6f2e8 100%);
+  padding-bottom: 0;
+  background: #3a2e20;
 }
 
 .hero {
@@ -292,9 +288,8 @@ function goLatestNotice() {
   min-height: clamp(880px, 135dvh, 1600px);
   padding: clamp(36px, 6vh, 84px) 0 clamp(110px, 8vh, 180px);
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(58, 41, 25, 0.95) 0%, rgba(45, 29, 17, 0.95) 62%, #372112 100%),
-    url('@/assets/path-bg.jpg');
+  background-color: #3a2e20;
+  background-image: url('@/assets/path-bg.jpg');
   background-size: cover;
   background-position: center top;
   background-attachment: fixed;
@@ -306,9 +301,7 @@ function goLatestNotice() {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 15%, rgba(255, 243, 210, 0.18), transparent 50%),
-    radial-gradient(circle at 80% 10%, rgba(255, 240, 200, 0.16), transparent 45%),
-    radial-gradient(circle at 50% 85%, rgba(0, 0, 0, 0.35), transparent 70%);
+  background: none;
   pointer-events: none;
 }
 
@@ -319,19 +312,10 @@ function goLatestNotice() {
   gap: clamp(16px, 3vw, 28px);
   padding: clamp(18px, 3vw, 28px);
   border-radius: 36px;
-  background: linear-gradient(145deg, #faf7ec 0%, #f2ede0 50%, #e7decd 100%);
-  border: 1px solid rgba(92, 64, 36, 0.22);
-  box-shadow: 0 48px 90px rgba(8, 6, 3, 0.45);
+  background: #f9f6eb;
+  box-shadow: 0 36px 72px rgba(8, 6, 3, 0.32);
   z-index: 0;
   margin-bottom: clamp(12px, 2vh, 24px);
-}
-.map-board::after {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  border-radius: 28px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
-  pointer-events: none;
 }
 .board-header {
   position: relative;
@@ -359,9 +343,8 @@ function goLatestNotice() {
   z-index: 1;
   width: 100%;
   aspect-ratio: 800 / 520;
-  border-radius: 28px;
-  overflow: visible;
-  box-shadow: inset 0 0 0 1px rgba(60, 45, 28, 0.12);
+  border-radius: 24px;
+  overflow: hidden;
 }
 .map-svg {
   width: 100%;
@@ -403,11 +386,6 @@ function goLatestNotice() {
   stroke: #4fa1c7;
   stroke-width: 4;
   opacity: 0.9;
-}
-.map-building {
-  fill: #fdf1c2;
-  stroke: #bd8a27;
-  stroke-width: 3;
 }
 .menu-point {
   cursor: pointer;
@@ -511,9 +489,7 @@ function goLatestNotice() {
   opacity: 0.18;
   pointer-events: none;
 }
-.gateway-card--notice {
-  --card-accent: linear-gradient(135deg, rgba(255, 173, 100, 0.4), rgba(255, 212, 150, 0.2));
-}
+.gateway-card--notice,
 .gateway-card--payment {
   --card-accent: linear-gradient(135deg, rgba(126, 192, 255, 0.4), rgba(167, 219, 255, 0.2));
 }
@@ -652,10 +628,6 @@ function goLatestNotice() {
     gap: 14px;
     padding: 18px;
     border-radius: 26px;
-  }
-  .map-board::after {
-    inset: 10px;
-    border-radius: 20px;
   }
   .board-body {
     border-radius: 20px;

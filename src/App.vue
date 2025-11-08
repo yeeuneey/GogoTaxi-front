@@ -39,7 +39,13 @@ const contentStyle = computed(() =>
 <style>
 :root { --header-h: 56px; --tab-h: 64px; --app-vh: 1vh; }
 * { box-sizing: border-box; }
-html, body, #app { height: 100%; margin: 0; overflow: hidden; }
+html, body, #app { height: 100%; margin: 0; }
+/* 전역 스크롤바 숨김 */
+::-webkit-scrollbar { display: none; }
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
 .app-shell {
   position: relative;

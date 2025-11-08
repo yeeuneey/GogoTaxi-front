@@ -5,11 +5,18 @@ import MainPageView from '@/views/MainPageView.vue'
 import UserLoginView from '@/views/UserLoginView.vue'
 import UserRegisterView from '@/views/UserRegisterView.vue'
 import FindAccountView from '@/views/FindAccountView.vue'
+import SocialConsentView from '@/views/SocialConsentView.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', name: 'login', component: UserLoginView, meta: { hideBottomNav: true } },
   { path: '/register', name: 'register', component: UserRegisterView, meta: { hideBottomNav: true } },
+  {
+    path: '/social-consent',
+    name: 'social-consent',
+    component: SocialConsentView,
+    meta: { hideBottomNav: true },
+  },
   { path: '/find-account', name: 'find-account', component: FindAccountView, meta: { hideBottomNav: true } },
   {
     path: '/create-room',

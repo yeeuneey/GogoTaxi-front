@@ -61,14 +61,14 @@ function formatDate(dateISO: string) {
 <style scoped>
 .notice {
   padding: clamp(96px, 14vh, 140px) clamp(16px, 4vw, 40px) clamp(72px, 10vh, 120px);
-  background: linear-gradient(180deg, #f6f2e8 0%, #ffffff 100%);
+  background: #3a2e20;
   min-height: calc(100dvh - var(--header-h));
 }
 .notice__header {
   max-width: 960px;
   margin: 0 auto clamp(28px, 5vh, 48px);
   text-align: center;
-  color: #2f241b;
+  color: #f8f1e4;
 }
 .notice__header h1 {
   margin: 0 0 12px;
@@ -76,7 +76,7 @@ function formatDate(dateISO: string) {
 }
 .notice__header p {
   margin: 0;
-  color: #6f6357;
+  color: rgba(255, 244, 220, 0.78);
   font-size: clamp(14px, 3vw, 16px);
 }
 .notice__layout {
@@ -133,10 +133,12 @@ function formatDate(dateISO: string) {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 .badge--update {
-  background: linear-gradient(135deg, #f97316, #fb923c);
+  background: #fdd651;
+  color: #2f1c00;
 }
 .badge--maintenance {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  background: #fdd651;
+  color: #2f1c00;
 }
 .badge--info {
   background: linear-gradient(135deg, #10b981, #34d399);
@@ -156,15 +158,15 @@ function formatDate(dateISO: string) {
   border: none;
   font-size: 13px;
   font-weight: 600;
-  color: #1d4ed8;
-  background: rgba(59, 130, 246, 0.16);
+  color: #f7f1e5;
+  background: #3a2e20;
   cursor: pointer;
   transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 .notice-card__action:hover {
   transform: translateY(-2px);
-  background: rgba(59, 130, 246, 0.26);
-  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.22);
+  background: #2c231a;
+  box-shadow: 0 12px 24px rgba(58, 46, 32, 0.4);
 }
 .notice-card__action span {
   transition: transform 0.2s ease;

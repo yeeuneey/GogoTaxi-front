@@ -137,17 +137,6 @@ function btnClass(name: string) {
   box-shadow: 0 -12px 26px rgba(40, 30, 20, 0.16);
   z-index: 10000;
 }
-.tabbar::before {
-  content: '';
-  position: absolute;
-  top: -18px;
-  left: 0;
-  right: 0;
-  height: 24px;
-  background: radial-gradient(circle at 20% 100%, rgba(255, 186, 140, 0.3), transparent 70%),
-    radial-gradient(circle at 80% 100%, rgba(134, 206, 255, 0.28), transparent 70%);
-  pointer-events: none;
-}
 .tab-btn {
   appearance: none;
   border: 0;
