@@ -289,7 +289,7 @@ function goLatestNotice() {
   padding: clamp(36px, 6vh, 84px) 0 clamp(110px, 8vh, 180px);
   overflow: hidden;
   background-color: #3a2e20;
-  background-image: url('@/assets/path-bg.jpg');
+
   background-size: cover;
   background-position: center top;
   background-attachment: fixed;
