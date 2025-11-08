@@ -8,7 +8,6 @@
         <h1>공지사항</h1>
         <span class="header-spacer" aria-hidden="true"></span>
       </div>
-      <p>꼬꼬택의 최신 소식을 모아두었어요.</p>
     </header>
 
     <div class="notice__layout">
@@ -72,13 +71,13 @@ function formatDate(dateISO: string) {
 
 <style scoped>
 .notice {
-  padding: clamp(96px, 14vh, 140px) clamp(16px, 4vw, 40px) clamp(72px, 10vh, 120px);
+  padding: 2rem 1.25rem 4rem;
   background: #3a2e20;
   min-height: calc(100dvh - var(--header-h));
 }
 .notice__header {
   max-width: 960px;
-  margin: 0 auto clamp(28px, 5vh, 48px);
+  margin: 0 auto 1.5rem;
   text-align: center;
   color: #f8f1e4;
 }

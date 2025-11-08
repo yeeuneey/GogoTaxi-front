@@ -326,7 +326,7 @@ onBeforeUnmount(() => {
 .settings-wrapper {
   min-height: 100vh;
   background: #3a2e20;
-  padding: 3.5rem 1.25rem 4rem;
+  padding: 2rem 1.25rem 4rem;
   font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
   display: flex;
   justify-content: center;
