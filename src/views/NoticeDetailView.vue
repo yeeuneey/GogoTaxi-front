@@ -1,5 +1,5 @@
 <template>
-  <section class="detail">
+  <section v-if="notice" class="detail">
     <header class="detail__header">
       <button class="detail__back" type="button" @click="goBack">← 목록으로</button>
       <span class="detail__badge" :class="`badge--${notice.type}`">
@@ -13,24 +13,33 @@
       <p v-for="(paragraph, idx) in notice.content" :key="idx">{{ paragraph }}</p>
     </article>
   </section>
+  <section v-else class="detail detail--empty">
+    <header class="detail__header">
+      <h1>공지사항을 찾을 수 없어요</h1>
+      <button class="detail__back" type="button" @click="goBack">← 목록으로</button>
+    </header>
+  </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { notices, NoticeType } from '@/components/notices'
+import { notices } from '@/components/notices'
+import type { Notice, NoticeType } from '@/components/notices'
 
 const route = useRoute()
 const router = useRouter()
 
-const notice = computed(() => {
-  const id = route.params.id as string
-  const found = notices.find((item) => item.id === id)
-  if (!found) {
-    router.replace({ name: 'notice' })
-    return notices[0]
-  }
-  return found
+const notice = computed<Notice | null>(() => {
+  const idParam = route.params.id
+  const fallback = notices[0] ?? null
+  if (typeof idParam !== 'string') return fallback
+
+  const found = notices.find(item => item.id === idParam)
+  if (found) return found
+
+  router.replace({ name: 'notice' })
+  return fallback
 })
 
 function badgeLabel(type: NoticeType) {
@@ -120,5 +129,12 @@ function goBack() {
   color: #4f4338;
   line-height: 1.8;
   font-size: 16px;
+}
+.detail--empty {
+  align-content: center;
+  text-align: center;
+}
+.detail--empty .detail__header {
+  justify-items: center;
 }
 </style>

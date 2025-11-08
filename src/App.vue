@@ -2,12 +2,7 @@
   <div id="app" class="app-shell">
     <AppHeader />
 
-    <main
-      class="app-content"
-      :style="hideBottomTab
-        ? { paddingBottom: '0', minHeight: 'calc(100vh - var(--header-h))' }
-        : {}"
-    >
+    <main class="app-content" :style="contentStyle">
       <router-view />
     </main>
 
@@ -29,17 +24,34 @@ const hideBottomTab = computed(() => {
   // 2) meta로 더 확장 가능:
   return Boolean(route.meta?.hideBottomNav)
 })
+
+const contentStyle = computed(() =>
+  hideBottomTab.value
+    ? {
+        paddingBottom: '0',
+        minHeight: 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))',
+        height: 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))',
+      }
+    : {},
+)
 </script>
 
 <style>
-:root { --header-h: 56px; --tab-h: 64px; }
+:root { --header-h: 56px; --tab-h: 64px; --app-vh: 1vh; }
 * { box-sizing: border-box; }
-html, body, #app { height: 100%; margin: 0; }
+html, body, #app { height: 100%; margin: 0; overflow: hidden; }
 
-.app-shell { position: relative; min-height: 100%; background: #fff; }
+.app-shell {
+  position: relative;
+  height: calc(var(--app-vh, 1vh) * 100);
+  background: #fff;
+  overflow: hidden;
+}
 .app-content {
   padding-top: var(--header-h);
   padding-bottom: var(--tab-h); /* 기본값(탭 보일 때) */
-  min-height: calc(100vh - var(--header-h) - var(--tab-h));
+  height: calc((var(--app-vh, 1vh) * 100) - var(--header-h));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 </style>

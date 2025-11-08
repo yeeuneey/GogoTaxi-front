@@ -101,13 +101,16 @@ export function isAuthed() {
   return Boolean(storage.getItem(TOKEN_KEY))
 }
 
-export function updateUserPassword(id: string, nextPassword: string) {
+export function updateUserPassword(id: string, nextPassword: string): Pick<User, 'id' | 'name'> {
   const users = loadUsers()
   const targetIndex = users.findIndex(u => u.id === id)
   if (targetIndex < 0) throw new Error('존재하지 않는 아이디입니다.')
-  users[targetIndex] = { ...users[targetIndex], password: nextPassword }
+  const targetUser = users[targetIndex]
+  if (!targetUser) throw new Error('존재하지 않는 아이디입니다.')
+  const updatedUser: User = { ...targetUser, password: nextPassword }
+  users[targetIndex] = updatedUser
   saveUsers(users)
-  return { id: users[targetIndex].id, name: users[targetIndex].name }
+  return { id: updatedUser.id, name: updatedUser.name }
 }
 
 export type SocialProvider = 'kakao' | 'google'
