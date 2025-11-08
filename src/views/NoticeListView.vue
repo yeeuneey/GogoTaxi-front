@@ -49,7 +49,7 @@ function goDetail(id: string) {
 }
 
 function goBack() {
-  router.back()
+  router.push({ name: 'mypage' })
 }
 
 function badgeLabel(type: NoticeType) {
