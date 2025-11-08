@@ -1,7 +1,13 @@
 <template>
   <section class="notice">
     <header class="notice__header">
-      <h1>공지사항</h1>
+      <div class="notice__header-top">
+        <button type="button" class="back-button" :aria-label="backLabel" @click="goBack">
+          <img :src="arrowBackIcon" alt="" class="back-icon" aria-hidden="true" />
+        </button>
+        <h1>공지사항</h1>
+        <span class="header-spacer" aria-hidden="true"></span>
+      </div>
       <p>꼬꼬택의 최신 소식을 모아두었어요.</p>
     </header>
 
@@ -17,7 +23,7 @@
           <h2>{{ notice.title }}</h2>
           <button class="notice-card__action" type="button" @click="goDetail(notice.id)">
             자세히 보기
-            <span aria-hidden="true">→</span>
+            <span aria-hidden="true">&rarr;</span>
           </button>
         </article>
       </aside>
@@ -30,8 +36,10 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { notices } from '@/components/notices'
 import type { NoticeType } from '@/components/notices'
+import arrowBackIcon from '@/assets/arrowback.png'
 
 const router = useRouter()
+const backLabel = '\uB4A4\uB85C\uAC00\uAE30'
 
 const sortedNotices = computed(() =>
   [...notices].sort((a, b) => (a.date < b.date ? 1 : -1)),
@@ -39,6 +47,10 @@ const sortedNotices = computed(() =>
 
 function goDetail(id: string) {
   router.push({ name: 'notice-detail', params: { id } })
+}
+
+function goBack() {
+  router.back()
 }
 
 function badgeLabel(type: NoticeType) {
@@ -70,14 +82,50 @@ function formatDate(dateISO: string) {
   text-align: center;
   color: #f8f1e4;
 }
+.notice__header-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 .notice__header h1 {
-  margin: 0 0 12px;
-  font-size: clamp(28px, 5vw, 36px);
+  margin: 0;
+  font-size: 1.2rem;
 }
 .notice__header p {
   margin: 0;
   color: rgba(255, 244, 220, 0.78);
   font-size: clamp(14px, 3vw, 16px);
+}
+.back-button {
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+.back-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+.back-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.header-spacer {
+  width: 44px;
+  height: 44px;
 }
 .notice__layout {
   max-width: 860px;
@@ -145,7 +193,7 @@ function formatDate(dateISO: string) {
 }
 .notice-card h2 {
   margin: 0;
-  font-size: 17px;
+  font-size: 1.2rem;
   color: #2f241b;
 }
 .notice-card__action {
