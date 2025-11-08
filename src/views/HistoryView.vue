@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="history-wrapper">
     <div class="history-container">
       <header class="history-header">
@@ -140,7 +140,7 @@ const goToReview = (rideId: number) => {
 
 .history-title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #eeeff2;
   justify-self: center;

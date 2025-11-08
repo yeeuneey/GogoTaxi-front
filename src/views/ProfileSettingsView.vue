@@ -372,7 +372,7 @@ onBeforeUnmount(() => {
 
 .settings-title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #eeeff2;
   justify-self: center;
