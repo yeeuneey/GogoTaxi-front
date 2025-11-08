@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="payment-wrapper">
     <div class="payment-container">
       <header class="payment-header">
@@ -225,9 +225,9 @@ const router = useRouter()
 
 const labels = {
   back: '마이페이지로 돌아가기',
-  title: '결제수단 관리',
+  title: '결제 수단 관리',
   remove: '삭제',
-  empty: '등록된 결제수단이 없습니다.',
+  empty: '등록된 결제 수단이 없습니다.',
   confirmTitle: '카드 삭제',
   confirmMessage: '결제 수단에서 이 카드를 삭제하시겠습니까?',
   cancel: '취소',
