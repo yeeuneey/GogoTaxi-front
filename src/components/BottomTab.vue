@@ -130,12 +130,17 @@ function btnClass(name: string) {
   right: 0;
   bottom: 0;
   height: var(--tab-h);
+  padding: 0 clamp(8px, 4vw, 18px) var(--safe-bottom);
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
   background: linear-gradient(135deg, #fff8f0 0%, #f1f5ff 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 0 -12px 26px rgba(40, 30, 20, 0.16);
   z-index: 10000;
+  transform: translateZ(0);
+  will-change: transform;
 }
 .tab-btn {
   appearance: none;
