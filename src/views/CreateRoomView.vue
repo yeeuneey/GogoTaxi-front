@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="create-room">
     <div class="map-area">
       <RoomMap :rooms="rooms" :selected-room="selectedPreview" />
@@ -154,7 +154,7 @@
 
             <label class="field">
               <span>출발 시간</span>
-              <input v-model="form.departureTime" type="datetime-local" />
+              <input v-model="form.departureTime" type="time" step="60" placeholder="예) 08:30" />
             </label>
           </div>
 
@@ -176,14 +176,30 @@
           </fieldset>
 
           <div class="form-grid">
-            <label class="field">
-              <span>결제수단</span>
-              <select v-model="form.paymentMethod">
-                <option v-for="method in paymentOptions" :key="method" :value="method">
-                  {{ method }}
-                </option>
-              </select>
-            </label>
+          <label class="field">
+            <span>결제수단</span>
+            <div v-if="availablePaymentMethods.length" class="payment-methods" role="radiogroup">
+              <button
+                v-for="method in availablePaymentMethods"
+                :key="method.id"
+                type="button"
+                class="payment-card"
+                :class="{ 'is-active': method.id === selectedPaymentMethodId }"
+                @click="selectPaymentMethod(method.id)"
+              >
+                <div class="payment-card__icon" :data-brand="method.brand ?? 'card'">
+                  {{ method.iconText }}
+                </div>
+                <div class="payment-card__text">
+                  <p class="payment-card__name">{{ method.label }}</p>
+                  <p v-if="method.description" class="payment-card__desc">
+                    {{ method.description }}
+                  </p>
+                </div>
+              </button>
+            </div>
+            <p v-else class="hint">결제수단을 먼저 등록해 주세요.</p>
+          </label>
 
             <label class="field">
               <span>예상 결제 금액 (거리 기반)</span>
@@ -230,10 +246,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch, watchEffect } from 'vue'
 import RoomMap from '@/components/RoomMap.vue'
 import type { RoomPreview } from '@/types/rooms'
 import { loadKakaoMaps, type KakaoNamespace } from '@/services/kakaoMaps'
+import {
+  getUserPaymentMethods,
+  type PaymentMethod as StoredPaymentMethod,
+} from '@/data/paymentMethods'
 
 type Priority = 'time' | 'seats'
 type FieldKind = 'departure' | 'arrival'
@@ -245,9 +265,22 @@ type SelectedPlace = {
   position: { lat: number; lng: number }
 }
 
-const paymentOptions = ['카카오페이', '토스페이', '현장 결제', '기타']
-
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }
+
+const ownedPaymentMethods = getUserPaymentMethods('credit-card')
+const fallbackPaymentMethod: StoredPaymentMethod = {
+  id: 'manual',
+  label: '현장 결제',
+  description: '기사님께 직접 결제',
+  iconText: '₩',
+}
+const availablePaymentMethods: StoredPaymentMethod[] = [
+  ...ownedPaymentMethods,
+  fallbackPaymentMethod,
+]
+const selectedPaymentMethodId = ref<string>(
+  availablePaymentMethods[0]?.id ?? fallbackPaymentMethod.id,
+)
 
 const priorityOptions = [
   { value: 'time', label: '시간 우선', description: '출발 시간을 가장 중요하게 맞춰요.' },
@@ -393,7 +426,18 @@ const form = reactive({
   arrival: null as SelectedPlace | null,
   departureTime: '',
   priority: 'time' as Priority,
-  paymentMethod: '카카오페이',
+  paymentMethod: '',
+})
+
+const selectPaymentMethod = (id: string) => {
+  selectedPaymentMethodId.value = id
+}
+
+watchEffect(() => {
+  const active =
+    availablePaymentMethods.find((method) => method.id === selectedPaymentMethodId.value) ??
+    fallbackPaymentMethod
+  form.paymentMethod = active.label
 })
 
 const departureQuery = ref('')
@@ -1037,6 +1081,60 @@ fieldset.field {
   background: #ffffff;
 }
 
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.85rem;
+}
+
+.payment-card {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 18px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fdfdff;
+  cursor: pointer;
+  transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.payment-card.is-active {
+  border-color: rgba(37, 99, 235, 0.6);
+  background: #eef3ff;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
+}
+
+.payment-card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.payment-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.payment-card__name {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.payment-card__desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
 .input-with-action {
   display: flex;
   align-items: center;
@@ -1211,3 +1309,4 @@ fieldset.field {
   }
 }
 </style>
+

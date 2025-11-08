@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="payment-wrapper">
     <div class="payment-container">
       <header class="payment-header">
@@ -294,28 +294,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import arrowBackIcon from '@/assets/arrowback.png'
 import { requestKakaoPayRedirect, type KakaoPayAction } from '@/services/kakaopay'
-
-type SectionId = 'credit-card' | 'kakao-pay'
-
-interface PaymentMethod {
-  id: string
-  label: string
-  description?: string
-  brand?: string
-  iconText: string
-  removable?: boolean
-}
-
-interface PaymentSection {
-  id: SectionId
-  title: string
-  description?: string
-  items: PaymentMethod[]
-  addLabel: string
-  addHint?: string
-  manageLabel?: string
-  emptyLabel?: string
-}
+import { createPaymentSections, type PaymentSection, type SectionId } from '@/data/paymentMethods'
 
 interface RemovalState {
   sectionId: SectionId
@@ -375,35 +354,7 @@ const labels = {
   addCardSubmit: '등록',
 }
 
-const sections = ref<PaymentSection[]>([
-  {
-    id: 'credit-card',
-    title: '신용/체크카드',
-    items: [
-      {
-        id: 'shinhan-card',
-        label: '신한 THE LADY 카드 (5123)',
-        description: '최근 이용 2025.10.12',
-        brand: 'card',
-        iconText: 'SH',
-        removable: true,
-      },
-    ],
-    addLabel: '추가',
-    emptyLabel: '등록된 카드가 없습니다.',
-  },
-  {
-    id: 'kakao-pay',
-    title: '카카오페이',
-    items: [
-      { id: 'toss', label: '토스뱅크카드 나이트핑크', brand: 'card', iconText: 'TP' },
-      { id: 'kb', label: 'KB국민 nori 체크카드(RF)', brand: 'kb', iconText: 'KB' },
-      { id: 'money', label: '카카오페이머니카드', brand: 'kakao', iconText: 'KP' },
-    ],
-    addLabel: '추가',
-    manageLabel: '카카오페이 관리',
-  },
-])
+const sections = ref<PaymentSection[]>(createPaymentSections())
 
 const paymentPassword = ref<string | null>(null)
 const hasPaymentPassword = computed(() => Boolean(paymentPassword.value))
