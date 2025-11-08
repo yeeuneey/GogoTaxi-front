@@ -219,7 +219,7 @@
         </article>
         <article class="gateway-card gateway-card--payment">
           <div class="card-body">
-            <h4>결제 수단 관리</h4>
+            <h4>결제수단 관리</h4>
             <p>등록된 카드와 계좌를 손쉽게 관리하고, 결제 이력을 확인할 수 있도록 준비 중이에요.</p>
           </div>
           <footer>
