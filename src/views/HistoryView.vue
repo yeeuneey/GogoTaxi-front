@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import arrowBackIcon from "@/assets/arrowback.png";
+import arrowBackIcon from "@/assets/arrowback.svg";
 
 const router = useRouter();
 
@@ -300,4 +300,3 @@ const goToReview = (rideId: number) => {
   }
 }
 </style>
-

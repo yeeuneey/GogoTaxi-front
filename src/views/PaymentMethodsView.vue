@@ -292,7 +292,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import arrowBackIcon from '@/assets/arrowback.png'
+import arrowBackIcon from '@/assets/arrowback.svg'
 import { requestKakaoPayRedirect, type KakaoPayAction } from '@/services/kakaopay'
 import { createPaymentSections, type PaymentSection, type SectionId } from '@/data/paymentMethods'
 

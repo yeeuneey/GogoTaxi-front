@@ -39,8 +39,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import editIcon from "@/assets/edit.png";
-import profileImage from "@/assets/user.png";
+import editIcon from "@/assets/edit.svg";
+import profileImage from "@/assets/user.svg";
 
 const router = useRouter();
 
@@ -116,22 +116,17 @@ const openProfileSettings = () => {
 }
 
 .avatar {
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  background: #fdd651;
+  width: 72px;
+  height: 72px;
   display: grid;
   place-items: center;
-  box-shadow: inset 0 0 0 3px #fff;
   flex-shrink: 0;
 }
 
 .avatar img {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #fff7e3;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .profile-info {
@@ -259,14 +254,14 @@ const openProfileSettings = () => {
   }
 
   .avatar {
-    width: 74px;
-    height: 74px;
+    width: 64px;
+    height: 64px;
     align-self: center;
   }
 
   .avatar img {
-    width: 60px;
-    height: 60px;
+    width: 100%;
+    height: 100%;
   }
 
   .profile-info {

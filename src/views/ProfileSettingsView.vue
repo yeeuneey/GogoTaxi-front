@@ -143,7 +143,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
-import arrowBackIcon from "@/assets/arrowback.png";
+import arrowBackIcon from "@/assets/arrowback.svg";
 
 const router = useRouter();
 

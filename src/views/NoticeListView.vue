@@ -35,7 +35,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { notices } from '@/components/notices'
 import type { NoticeType } from '@/components/notices'
-import arrowBackIcon from '@/assets/arrowback.png'
+import arrowBackIcon from '@/assets/arrowback.svg'
 
 const router = useRouter()
 const backLabel = '\uB4A4\uB85C\uAC00\uAE30'
