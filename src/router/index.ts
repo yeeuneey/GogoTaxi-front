@@ -21,7 +21,7 @@ const routes = [
     path: '/split-payment',
     name: 'split-payment',
     component: () => import('@/views/SplitPaymentView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, flushBottomNav: true, lockScroll: true },
   },
   { path: '/home', name: 'home', component: MainPageView, meta: { requiresAuth: true } },
   {

@@ -38,12 +38,13 @@ const formattedAmount = new Intl.NumberFormat('ko-KR', {
 
 <style scoped>
 .payment {
-  min-height: calc(100vh - var(--header-h));
-  padding: 32px 24px var(--tab-h);
+  height: calc((var(--app-vh, 1vh) * 100) - var(--header-h));
+  padding: 32px 24px 24px;
   background: #fff5cc;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  overflow: hidden;
 }
 
 .payment__header h1 {
@@ -104,7 +105,7 @@ const formattedAmount = new Intl.NumberFormat('ko-KR', {
   padding: 16px 20px;
   font-size: 16px;
   font-weight: 600;
-  background: #fbbf24;
+  background: #FDD651;
   color: #7c2d12;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
