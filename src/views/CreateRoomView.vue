@@ -1,181 +1,162 @@
 <template>
   <section class="create-room">
-    <div class="map-area">
-      <RoomMap :rooms="rooms" :selected-room="selectedPreview" />
-    </div>
-
-    <section
-      class="sheet"
-      :class="{
-        'sheet--dragging': isDragging,
-        'sheet--collapsed': isCollapsed,
-        'sheet--expanded': sheetHeight === MAX_SHEET,
-      }"
-      :style="sheetStyle"
-    >
-      <header
-        class="sheet__header"
-        @pointerdown="onPointerDown"
-        @pointerup="onPointerUp"
-        @pointercancel="onPointerCancel"
-      >
-        <span class="sheet__grip" />
+    <div class="create-room__container">
+      <header class="page-header">
         <div>
+          <p class="page-header__eyebrow"></p>
           <h1>방 생성하기</h1>
-          <p>목적지와 조건을 입력하면 꼬꼬택이 함께 탈 동승자를 찾아드려요.</p>
+          <p class="page-header__description">
+            목적지와 조건을 입력하면 꼬꼬택이 함께 탈 동승자를 찾아드려요.
+          </p>
         </div>
-        <button type="button" class="sheet__toggle" @click.stop="toggleSheet">
-          {{ sheetHeight === MAX_SHEET ? '접기' : '전체 보기' }}
-        </button>
       </header>
 
-      <div class="sheet__list" :class="{ 'sheet__list--collapsed': isCollapsed }">
-        <article class="preview-card">
-          <header class="preview-card__header">
-            <h2>{{ preview.title }}</h2>
-            <p>{{ preview.subtitle }}</p>
-          </header>
-          <div class="preview-route">
-            <div class="preview-route__line">
-              <span class="route-pin is-start" />
-              <div class="route-line__body">
-                <span class="route-label">
-                  {{ preview.departure }}
-                </span>
-                <span class="route-divider" />
-                <span class="route-label">
-                  {{ preview.arrival }}
-                </span>
-              </div>
-              <span class="route-pin is-end" />
+      <article class="preview-card">
+        <header class="preview-card__header">
+          <h2>{{ preview.title }}</h2>
+          <p>{{ preview.subtitle }}</p>
+        </header>
+        <div class="preview-route">
+          <div class="preview-route__line">
+            <span class="route-pin is-start" />
+            <div class="route-line__body">
+              <span class="route-label">
+                {{ preview.departure }}
+              </span>
+              <span class="route-divider" />
+              <span class="route-label">
+                {{ preview.arrival }}
+              </span>
             </div>
-            <ul class="route-meta">
-              <li>
-                <span>출발</span>
-                <strong>{{ preview.time }}</strong>
-              </li>
-              <li>
-                <span>우선순위</span>
-                <strong>{{ preview.priority }}</strong>
-              </li>
-              <li>
-                <span>결제</span>
-                <strong>{{ preview.paymentMethod }}</strong>
-              </li>
-              <li>
-                <span>예상 금액</span>
-                <strong>{{ preview.fare }}</strong>
-              </li>
-            </ul>
+            <span class="route-pin is-end" />
           </div>
-        </article>
+          <ul class="route-meta">
+            <li>
+              <span>출발</span>
+              <strong>{{ preview.time }}</strong>
+            </li>
+            <li>
+              <span>우선순위</span>
+              <strong>{{ preview.priority }}</strong>
+            </li>
+            <li>
+              <span>결제</span>
+              <strong>{{ preview.paymentMethod }}</strong>
+            </li>
+            <li>
+              <span>예상 금액</span>
+              <strong>{{ preview.fare }}</strong>
+            </li>
+          </ul>
+        </div>
+      </article>
 
-        <form class="form" @submit.prevent="submitForm">
-          <div class="form-grid">
-            <label class="field">
-              <span>방 이름</span>
+      <form class="form" @submit.prevent="submitForm">
+        <div class="form-grid">
+          <label class="field">
+            <span>방 이름</span>
+            <input
+              v-model.trim="form.title"
+              type="text"
+              maxlength="25"
+              placeholder="공항팟 99 !!"
+            />
+          </label>
+
+          <label class="field field--autocomplete">
+            <span>출발지</span>
+            <div class="input-with-action">
               <input
-                v-model.trim="form.title"
+                v-model="departureQuery"
                 type="text"
-                maxlength="25"
-                placeholder="예) 강남 → 인천공항 야간 합승"
+                placeholder="예) 강남역 5번 출구"
+                autocomplete="off"
+                @focus="setActiveField('departure')"
+                @blur="handleBlur('departure')"
               />
-            </label>
-
-            <label class="field field--autocomplete">
-              <span>출발지</span>
-              <div class="input-with-action">
-                <input
-                  v-model="departureQuery"
-                  type="text"
-                  placeholder="예) 강남역 5번 출구"
-                  autocomplete="off"
-                  @focus="setActiveField('departure')"
-                  @blur="handleBlur('departure')"
-                />
-                <button
-                  type="button"
-                  class="pin-button"
-                  @mousedown.prevent
-                  @click="openMapPicker('departure')"
-                  aria-label="지도에서 출발지 선택"
-                >
-                  📍
-                </button>
-              </div>
-              <p v-if="isSearching.departure" class="hint">검색 중...</p>
-              <ul
-                v-if="activeField === 'departure' && departureSuggestions.length"
-                class="suggestion-list"
-              >
-                <li v-for="place in departureSuggestions" :key="place.id">
-                  <button type="button" @mousedown.prevent="selectPlace('departure', place)">
-                    <strong>{{ place.name }}</strong>
-                    <span>{{ place.address }}</span>
-                  </button>
-                </li>
-              </ul>
-            </label>
-
-            <label class="field field--autocomplete">
-              <span>도착지</span>
-              <div class="input-with-action">
-                <input
-                  v-model="arrivalQuery"
-                  type="text"
-                  placeholder="예) 인천국제공항 T1"
-                  autocomplete="off"
-                  @focus="setActiveField('arrival')"
-                  @blur="handleBlur('arrival')"
-                />
-                <button
-                  type="button"
-                  class="pin-button"
-                  @mousedown.prevent
-                  @click="openMapPicker('arrival')"
-                  aria-label="지도에서 도착지 선택"
-                >
-                  📍
-                </button>
-              </div>
-              <p v-if="isSearching.arrival" class="hint">검색 중...</p>
-              <ul
-                v-if="activeField === 'arrival' && arrivalSuggestions.length"
-                class="suggestion-list"
-              >
-                <li v-for="place in arrivalSuggestions" :key="place.id">
-                  <button type="button" @mousedown.prevent="selectPlace('arrival', place)">
-                    <strong>{{ place.name }}</strong>
-                    <span>{{ place.address }}</span>
-                  </button>
-                </li>
-              </ul>
-            </label>
-
-            <label class="field">
-              <span>출발 시간</span>
-              <input v-model="form.departureTime" type="time" step="60" placeholder="예) 08:30" />
-            </label>
-          </div>
-
-          <fieldset class="field priority-field">
-            <legend>매칭 우선순위</legend>
-            <div class="priority-toggle">
               <button
-                v-for="option in priorityOptions"
-                :key="option.value"
                 type="button"
-                class="priority-chip"
-                :class="{ 'is-active': form.priority === option.value }"
-                @click="form.priority = option.value"
+                class="pin-button"
+                @mousedown.prevent
+                @click="openMapPicker('departure')"
+                aria-label="지도에서 출발지 선택"
               >
-                <span>{{ option.label }}</span>
-                <small>{{ option.description }}</small>
+                📍
               </button>
             </div>
-          </fieldset>
+            <p v-if="isSearching.departure" class="hint">검색 중...</p>
+            <ul
+              v-if="activeField === 'departure' && departureSuggestions.length"
+              class="suggestion-list"
+            >
+              <li v-for="place in departureSuggestions" :key="place.id">
+                <button type="button" @mousedown.prevent="selectPlace('departure', place)">
+                  <strong>{{ place.name }}</strong>
+                  <span>{{ place.address }}</span>
+                </button>
+              </li>
+            </ul>
+          </label>
 
-          <div class="form-grid">
+          <label class="field field--autocomplete">
+            <span>도착지</span>
+            <div class="input-with-action">
+              <input
+                v-model="arrivalQuery"
+                type="text"
+                placeholder="예) 인천국제공항 T1"
+                autocomplete="off"
+                @focus="setActiveField('arrival')"
+                @blur="handleBlur('arrival')"
+              />
+              <button
+                type="button"
+                class="pin-button"
+                @mousedown.prevent
+                @click="openMapPicker('arrival')"
+                aria-label="지도에서 도착지 선택"
+              >
+                📍
+              </button>
+            </div>
+            <p v-if="isSearching.arrival" class="hint">검색 중...</p>
+            <ul
+              v-if="activeField === 'arrival' && arrivalSuggestions.length"
+              class="suggestion-list"
+            >
+              <li v-for="place in arrivalSuggestions" :key="place.id">
+                <button type="button" @mousedown.prevent="selectPlace('arrival', place)">
+                  <strong>{{ place.name }}</strong>
+                  <span>{{ place.address }}</span>
+                </button>
+              </li>
+            </ul>
+          </label>
+
+          <label class="field">
+            <span>출발 시간</span>
+            <input v-model="form.departureTime" type="time" step="60" placeholder="예) 08:30" />
+          </label>
+        </div>
+
+        <fieldset class="field priority-field">
+          <legend>매칭 우선순위</legend>
+          <div class="priority-toggle">
+            <button
+              v-for="option in priorityOptions"
+              :key="option.value"
+              type="button"
+              class="priority-chip"
+              :class="{ 'is-active': form.priority === option.value }"
+              @click="form.priority = option.value"
+            >
+              <span>{{ option.label }}</span>
+              <small>{{ option.description }}</small>
+            </button>
+          </div>
+        </fieldset>
+
+        <div class="form-grid">
           <label class="field">
             <span>결제수단</span>
             <div v-if="availablePaymentMethods.length" class="payment-methods" role="radiogroup">
@@ -201,28 +182,27 @@
             <p v-else class="hint">결제수단을 먼저 등록해 주세요.</p>
           </label>
 
-            <label class="field">
-              <span>예상 결제 금액 (거리 기반)</span>
-              <input :value="preview.fare" type="text" readonly />
-              <p class="hint">
-                약 {{ distanceLabel }} · KakaoMap 거리 계산 기준
-              </p>
-            </label>
-          </div>
+          <label class="field">
+            <span>예상 결제 금액 (거리 기반)</span>
+            <input :value="preview.fare" type="text" readonly />
+            <p class="hint">
+              약 {{ distanceLabel }} · KakaoMap 거리 계산 기준
+            </p>
+          </label>
+        </div>
 
-          <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
 
-          <footer class="actions">
-            <button type="button" class="ghost-button" @click="resetForm">초기화</button>
-            <button type="submit" class="primary-button" :disabled="!isValid">
-              방 생성하기
-            </button>
-          </footer>
+        <footer class="actions">
+          <button type="button" class="ghost-button" @click="resetForm">초기화</button>
+          <button type="submit" class="primary-button" :disabled="!isValid">
+            방 생성하기
+          </button>
+        </footer>
 
-          <p v-if="successMessage" class="form-success">{{ successMessage }}</p>
-        </form>
-      </div>
-    </section>
+        <p v-if="successMessage" class="form-success">{{ successMessage }}</p>
+      </form>
+    </div>
 
     <div v-if="mapPickerVisible" class="map-picker">
       <div class="map-picker__backdrop" @click="closeMapPicker" aria-hidden="true"></div>
@@ -245,17 +225,17 @@
   </section>
 </template>
 
+
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, nextTick, reactive, ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import RoomMap from '@/components/RoomMap.vue'
 import type { RoomPreview } from '@/types/rooms'
 import { loadKakaoMaps, type KakaoNamespace } from '@/services/kakaoMaps'
 import {
   getUserPaymentMethods,
   type PaymentMethod as StoredPaymentMethod,
 } from '@/data/paymentMethods'
-import { addRoom, loadRooms } from '@/data/roomsStore'
+import { addRoom } from '@/data/roomsStore'
 
 type Priority = 'time' | 'seats'
 type FieldKind = 'departure' | 'arrival'
@@ -289,107 +269,6 @@ const priorityOptions = [
   { value: 'time', label: '시간 우선', description: '출발 시간을 가장 중요하게 맞춰요.' },
   { value: 'seats', label: '인원 우선', description: '비슷한 인원을 먼저 찾아요.' },
 ] satisfies Array<{ value: Priority; label: string; description: string }>
-
-const COLLAPSED_SHEET = 22
-const MID_SHEET = 65
-const MAX_SHEET = 100
-const SHEET_STATES = [COLLAPSED_SHEET, MID_SHEET, MAX_SHEET] as const
-const SNAP_THRESHOLD = 6
-
-const rooms = ref<RoomPreview[]>(loadRooms())
-const sheetHeight = ref<number>(MID_SHEET)
-const isDragging = ref(false)
-const isCollapsed = computed(() => !isDragging.value && sheetHeight.value === COLLAPSED_SHEET)
-const sheetStyle = computed(() =>
-  isCollapsed.value ? { height: 'auto', minHeight: '140px' } : { height: `${sheetHeight.value}vh` },
-)
-
-let startY = 0
-let startHeight = MID_SHEET
-
-function clamp(value: number) {
-  return Math.min(MAX_SHEET, Math.max(COLLAPSED_SHEET, value))
-}
-
-function closestStateIndex(value: number) {
-  let nearestIndex = 0
-  let minDiff = Number.POSITIVE_INFINITY
-  SHEET_STATES.forEach((state, idx) => {
-    const diff = Math.abs(state - value)
-    if (diff < minDiff) {
-      minDiff = diff
-      nearestIndex = idx
-    }
-  })
-  return nearestIndex
-}
-
-function stateValueAt(index: number) {
-  const clampedIndex = Math.min(SHEET_STATES.length - 1, Math.max(0, index))
-  return SHEET_STATES[clampedIndex] ?? MID_SHEET
-}
-
-function onPointerDown(event: PointerEvent) {
-  if (event.pointerType === 'mouse' && event.buttons !== 1) return
-  event.preventDefault()
-  isDragging.value = true
-  startY = event.clientY
-  startHeight = sheetHeight.value
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
-  window.addEventListener('pointercancel', onPointerCancel)
-}
-
-function onPointerMove(event: PointerEvent) {
-  if (!isDragging.value) return
-  const deltaY = startY - event.clientY
-  const deltaPercent = (deltaY / window.innerHeight) * 100
-  sheetHeight.value = clamp(startHeight + deltaPercent)
-}
-
-function finishDrag() {
-  if (!isDragging.value) return
-  isDragging.value = false
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
-
-  const clamped = clamp(sheetHeight.value)
-  sheetHeight.value = clamped
-  const delta = clamped - startHeight
-  const absDelta = Math.abs(delta)
-
-  if (absDelta < SNAP_THRESHOLD) {
-    sheetHeight.value = stateValueAt(closestStateIndex(startHeight))
-    return
-  }
-
-  const startIdx = closestStateIndex(startHeight)
-  const targetIdx = closestStateIndex(clamped)
-
-  if (targetIdx === startIdx && absDelta >= SNAP_THRESHOLD) {
-    const direction = delta > 0 ? 1 : -1
-    sheetHeight.value = stateValueAt(startIdx + direction)
-    return
-  }
-
-  sheetHeight.value = stateValueAt(targetIdx)
-}
-
-function onPointerUp(event: PointerEvent) {
-  if (isDragging.value) {
-    onPointerMove(event)
-    finishDrag()
-  }
-}
-
-function onPointerCancel() {
-  finishDrag()
-}
-
-function toggleSheet() {
-  sheetHeight.value = sheetHeight.value === MAX_SHEET ? MID_SHEET : MAX_SHEET
-}
 
 const form = reactive({
   title: '',
@@ -454,22 +333,6 @@ const preview = computed(() => ({
 const distanceLabel = computed(() => {
   if (!estimatedDistanceKm.value) return '거리 계산 중'
   return `${estimatedDistanceKm.value.toFixed(1)}km`
-})
-
-const selectedPreview = computed<RoomPreview | null>(() => {
-  if (!form.departure && !form.arrival) return null
-  const departure = form.departure ?? form.arrival
-  const arrival = form.arrival ?? form.departure
-  if (!departure || !arrival) return null
-  return {
-    id: 'new-room-preview',
-    title: form.title.trim() || '새로운 방',
-    departure: { label: departure.name, position: departure.position },
-    arrival: { label: arrival.name, position: arrival.position },
-    time: preview.value.time,
-    seats: form.priority === 'seats' ? 3 : 1,
-    tags: [preview.value.priority, form.paymentMethod],
-  }
 })
 
 let kakaoApi: KakaoNamespace | null = null
@@ -766,7 +629,6 @@ function submitForm() {
   }
 
   addRoom(newRoom)
-  rooms.value = loadRooms()
   successMessage.value = '새로운 방이 생성됐어요! 방 찾기에서 확인해 주세요.'
   setTimeout(() => {
     router.push({ name: 'find-room' })
@@ -774,120 +636,48 @@ function submitForm() {
   }, 400)
 }
 
-onBeforeUnmount(() => {
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
-})
 </script>
 
 <style scoped>
 .create-room {
-  position: relative;
   min-height: 100dvh;
   background: #0f172a;
-  overflow: hidden;
   color: #1f2937;
 }
 
-.map-area {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.sheet {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  background: #ffffff;
-  border-radius: 28px 28px 0 0;
+.create-room__container {
+  width: min(880px, 100%);
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 64px) clamp(16px, 5vw, 42px) clamp(64px, 7vw, 96px);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 -18px 40px rgba(15, 23, 42, 0.12);
-  transition: height 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
-  will-change: height;
-  touch-action: none;
-  z-index: 1;
+  gap: clamp(16px, 3vw, 28px);
 }
 
-.sheet--dragging {
-  transition: none;
+.page-header {
+  background: #ffffff;
+  border-radius: 32px;
+  padding: clamp(18px, 3vw, 28px);
+  box-shadow: 0 30px 50px rgba(15, 23, 42, 0.25);
 }
 
-.sheet__header {
-  position: relative;
-  padding: clamp(12px, 2.6vw, 16px) clamp(18px, 4vw, 26px) clamp(10px, 2.4vw, 14px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(12px, 3.6vw, 18px);
-  cursor: grab;
-  user-select: none;
-  flex-wrap: wrap;
-}
-
-.sheet__header:active {
-  cursor: grabbing;
-}
-
-.sheet__grip {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  width: 48px;
-  height: 5px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.12);
-  transform: translateX(-50%);
-}
-
-.sheet__header h1 {
-  margin: 4px 0 0;
-  font-size: clamp(16px, 3.4vw, 20px);
-}
-
-.sheet__header p {
+.page-header__eyebrow {
   margin: 0;
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.sheet__toggle {
-  margin-left: auto;
-  border: none;
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
+  font-size: 0.85rem;
   font-weight: 600;
-  font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: #2563eb;
 }
 
-.sheet__toggle:hover {
-  background: rgba(37, 99, 235, 0.2);
-  color: #1d4ed8;
+.page-header h1 {
+  margin: 0.35rem 0 0.5rem;
+  font-size: clamp(1.45rem, 4vw, 1.9rem);
+  color: #0f172a;
 }
 
-.sheet__list {
-  flex: 1;
-  overflow-y: auto;
-  padding: clamp(6px, 1.6vw, 10px) clamp(18px, 4vw, 26px) clamp(18px, 3.6vw, 26px);
-  display: grid;
-  gap: clamp(14px, 2.6vw, 20px);
-}
-
-.sheet__list--collapsed {
-  max-height: clamp(140px, 32vh, 200px);
-  padding-bottom: clamp(10px, 2.4vw, 16px);
-  margin-top: clamp(6px, 1.8vw, 10px);
-  overflow: hidden;
-  pointer-events: none;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0));
-  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0));
+.page-header__description {
+  margin: 0;
+  color: #475569;
+  line-height: 1.4;
 }
 
 .preview-card {
@@ -988,6 +778,13 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 0.5rem;
+  padding: clamp(18px, 3.6vw, 24px);
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow:
+    0 24px 48px rgba(15, 23, 42, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 .form-grid {
@@ -1293,9 +1090,8 @@ fieldset.field {
 }
 
 @media (min-width: 960px) {
-  .sheet {
-    margin-inline: auto;
-    max-width: 880px;
+  .create-room__container {
+    max-width: 960px;
   }
 }
 </style>
