@@ -135,6 +135,8 @@ const openProfileSettings = () => {
   gap: 0.4rem;
   justify-content: center;
   min-height: 84px;
+  flex: 1;
+  min-width: 0;
 }
 
 .profile-name {
@@ -246,13 +248,6 @@ const openProfileSettings = () => {
 }
 
 @media (max-width: 480px) {
-  .profile-block {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.1rem;
-    text-align: center;
-  }
-
   .avatar {
     width: 64px;
     height: 64px;
