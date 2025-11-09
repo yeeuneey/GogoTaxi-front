@@ -62,7 +62,6 @@
       </transition>
 
       <footer class="seat-card__actions">
-        <button type="button" class="btn btn--ghost" @click="goBackHome">나중에 할게요</button>
         <button type="button" class="btn btn--primary" :disabled="!selectedSeat" @click="confirmSeat">
           좌석 확정하기
         </button>
@@ -73,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 interface SeatInfo {
   number: number
@@ -89,6 +88,7 @@ const seats: SeatInfo[] = [
 ]
 
 const router = useRouter()
+const route = useRoute()
 const selectedSeat = ref<number | null>(null)
 
 function seatStyle(seat: SeatInfo) {
@@ -102,14 +102,14 @@ function selectSeat(seatNumber: number) {
   selectedSeat.value = seatNumber
 }
 
-function goBackHome() {
-  router.push({ name: 'home' })
-}
-
 function confirmSeat() {
   if (!selectedSeat.value) return
-  alert(`${selectedSeat.value}번 좌석으로 확정했습니다.`)
-  router.push({ name: 'home' })
+  const roomId = (route.query.roomId as string) || 'room-101'
+  router.push({
+    name: 'room-detail',
+    params: { id: roomId },
+    query: { seat: selectedSeat.value },
+  })
 }
 </script>
 

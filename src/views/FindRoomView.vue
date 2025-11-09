@@ -75,6 +75,40 @@
           <footer class="room-card__tags">
             <span v-for="tag in room.tags" :key="tag">#{{ tag }}</span>
           </footer>
+          <transition name="room-detail">
+            <section
+              v-if="selectedRoom?.id === room.id"
+              class="room-detail"
+              @click.stop
+            >
+              <header class="room-detail__header">
+                <h3>{{ room.title }}</h3>
+                <p class="room-detail__subtitle">{{ room.departure.label }} → {{ room.arrival.label }}</p>
+              </header>
+              <dl class="room-detail__meta">
+                <div>
+                  <dt>출발지</dt>
+                  <dd>{{ room.departure.label }}</dd>
+                </div>
+                <div>
+                  <dt>도착지</dt>
+                  <dd>{{ room.arrival.label }}</dd>
+                </div>
+                <div>
+                  <dt>출발 시간</dt>
+                  <dd>{{ room.time }}</dd>
+                </div>
+                <div>
+                  <dt>잔여 좌석</dt>
+                  <dd>{{ room.seats }}자리</dd>
+                </div>
+              </dl>
+              <footer class="room-detail__tags">
+                <span v-for="tag in room.tags" :key="tag">#{{ tag }}</span>
+              </footer>
+              <button type="button" class="room-detail__cta" @click.stop="joinRoom(room)">방 들어가기</button>
+            </section>
+          </transition>
         </article>
       </div>
     </section>
@@ -85,6 +119,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import RoomMap from '@/components/RoomMap.vue'
+import { mockRooms } from '@/data/mockRooms'
 import type { RoomPreview } from '@/types/rooms'
 
 const COLLAPSED_SHEET = 22
@@ -94,68 +129,7 @@ const SHEET_STATES = [COLLAPSED_SHEET, MID_SHEET, MAX_SHEET] as const
 const SNAP_THRESHOLD = 6
 
 const router = useRouter()
-const rooms = ref<RoomPreview[]>([
-  {
-    id: 'room-101',
-    title: '강남역 → 인천공항 새벽 합승',
-    departure: {
-      label: '강남역 5번 출구',
-      position: { lat: 37.498095, lng: 127.02761 },
-    },
-    arrival: {
-      label: '인천국제공항 제1터미널',
-      position: { lat: 37.4602, lng: 126.4407 },
-    },
-    time: '오늘 23:30 출발',
-    seats: 2,
-    tags: ['야간', '공항', '편안한 분위기'],
-  },
-  {
-    id: 'room-102',
-    title: '신촌역 → 수원역 아침 출근',
-    departure: {
-      label: '신촌역 2번 출구',
-      position: { lat: 37.55515, lng: 126.9368 },
-    },
-    arrival: {
-      label: '수원역 AK플라자 앞',
-      position: { lat: 37.2664, lng: 126.9997 },
-    },
-    time: '내일 07:10 출발',
-    seats: 1,
-    tags: ['출근', '정시출발'],
-  },
-  {
-    id: 'room-103',
-    title: '홍대입구역 → 판교역',
-    departure: {
-      label: '홍대입구역 9번 출구',
-      position: { lat: 37.5575, lng: 126.9242 },
-    },
-    arrival: {
-      label: '판교역 2번 출구',
-      position: { lat: 37.3948, lng: 127.1109 },
-    },
-    time: '오늘 20:00 출발',
-    seats: 3,
-    tags: ['직장인', '음악조용히', '비흡연'],
-  },
-  {
-    id: 'room-104',
-    title: '부산 서면 → 해운대 야간',
-    departure: {
-      label: '서면역 7번 출구 택시승강장',
-      position: { lat: 35.1576, lng: 129.0593 },
-    },
-    arrival: {
-      label: '해운대 해수욕장 입구',
-      position: { lat: 35.1587, lng: 129.1604 },
-    },
-    time: '오늘 22:10 출발',
-    seats: 1,
-    tags: ['야경투어', '편안한 분위기'],
-  },
-])
+const rooms = ref<RoomPreview[]>([...mockRooms])
 
 const viewRef = ref<HTMLElement | null>(null)
 const sheetHeight = ref<number>(MID_SHEET)
@@ -296,6 +270,10 @@ function selectRoom(room: RoomPreview) {
   selectedRoom.value = selectedRoom.value?.id === room.id ? null : room
 }
 
+function joinRoom(room: RoomPreview) {
+  router.push({ name: 'seat-selection', query: { roomId: room.id } })
+}
+
 function goToCreateRoom() {
   router.push({ name: 'create-room' })
 }
@@ -315,6 +293,12 @@ watch(
   },
   { deep: true },
 )
+
+watch(selectedRoom, () => {
+  if (isCollapsed.value) {
+    scheduleCollapsedMeasurement()
+  }
+})
 
 onMounted(() => {
   updateAvailableHeight()
@@ -456,6 +440,7 @@ onBeforeUnmount(() => {
 .sheet__list {
   flex: 1;
   overflow-y: auto;
+  overflow-anchor: none;
   padding: clamp(6px, 1.6vw, 10px) clamp(18px, 4vw, 26px) clamp(18px, 3.6vw, 26px);
   scroll-padding-bottom: var(--tab-h);
   display: grid;
@@ -482,6 +467,7 @@ onBeforeUnmount(() => {
   gap: 12px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+  overflow-anchor: none;
 }
 
 .room-card:hover {
@@ -555,6 +541,95 @@ onBeforeUnmount(() => {
   background: rgba(251, 191, 36, 0.25);
   padding: 6px 10px;
   border-radius: 999px;
+}
+
+.room-detail-enter-active,
+.room-detail-leave-active {
+  transition: all 0.25s ease;
+}
+
+.room-detail-enter-from,
+.room-detail-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.room-detail {
+  margin-top: 10px;
+  padding: clamp(14px, 3vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  background: #fff9db;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.room-detail__header h3 {
+  margin: 0;
+  font-size: clamp(15px, 3.6vw, 18px);
+  color: #0f172a;
+}
+
+.room-detail__subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.room-detail__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.room-detail__meta dt {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.room-detail__meta dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.room-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.room-detail__tags span {
+  font-size: 12px;
+  color: #92400e;
+  background: rgba(251, 191, 36, 0.35);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.room-detail__cta {
+  border: none;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #fcd34d;
+  color: #78350f;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(234, 179, 8, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.room-detail__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(202, 138, 4, 0.35);
 }
 
 @media (min-width: 960px) {

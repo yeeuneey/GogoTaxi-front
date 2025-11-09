@@ -16,4 +16,13 @@ export type RoomPreview = {
   time: string
   seats: number
   tags: string[]
+  eta?: string
+  fare?: number
+  myFare?: number
+  status?: 'recruiting' | 'dispatching' | 'success' | 'failed'
+  taxi?: {
+    carNumber: string
+    driverName: string
+    carModel: string
+  }
 }
