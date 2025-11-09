@@ -43,9 +43,20 @@
             </div>
           </dl>
           <div class="room-panel__cta">
-            <button type="button" class="link-btn" @click="openRoute">경로 보기</button>
+            <button type="button" class="link-btn" @click="toggleRouteMap">
+              {{ showRouteMap ? '지도 닫기' : '경로 보기' }}
+            </button>
             <button type="button" class="link-btn" @click="changeSeat">좌석 다시 고르기</button>
           </div>
+          <transition name="route-map">
+            <div v-if="showRouteMap" ref="routeMapRef" class="route-map-wrapper">
+              <RouteMapBox
+                :departure="room.departure"
+                :arrival="room.arrival"
+                :title="room.title"
+              />
+            </div>
+          </transition>
         </article>
 
         <article class="room-panel room-panel--fare">
@@ -114,10 +125,11 @@
   </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getRoomById, mockRooms } from '@/data/mockRooms'
 import type { RoomPreview } from '@/types/rooms'
+import RouteMapBox from '@/components/RouteMapBox.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -148,9 +160,8 @@ const perPersonFare = computed(() =>
   room.value.fare ? Math.round(room.value.fare / participantCount.value) : undefined,
 )
 
-function openRoute() {
-  alert('지도 경로는 다음 업데이트에서 제공될 예정입니다.')
-}
+const showRouteMap = ref(false)
+const routeMapRef = ref<HTMLElement | null>(null)
 
 function changeSeat() {
   router.push({ name: 'seat-selection', query: { roomId: roomId.value } })
@@ -162,6 +173,15 @@ function leaveRoom() {
 
 function retryDispatch() {
   alert('배차를 다시 시도합니다. 조금만 기다려 주세요!')
+}
+
+function toggleRouteMap() {
+  showRouteMap.value = !showRouteMap.value
+  if (showRouteMap.value) {
+    nextTick(() => {
+      routeMapRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
 }
 
 type DispatchStatus = NonNullable<RoomPreview['status']>
@@ -308,6 +328,21 @@ function formatFare(amount?: number) {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.route-map-wrapper {
+  margin-top: 18px;
+}
+
+.route-map-enter-active,
+.route-map-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.route-map-enter-from,
+.route-map-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
 }
 
 .link-btn {
