@@ -215,7 +215,7 @@
         <footer class="map-picker__actions">
           <button type="button" class="ghost-button" @click="closeMapPicker">취소</button>
           <button type="button" class="primary-button" @click="confirmMapPicker">
-            이 위치 사용
+            확인
           </button>
         </footer>
       </div>
@@ -886,9 +886,9 @@ fieldset.field {
 
 .priority-chip {
   border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   padding: 0.75rem 1rem;
-  background: #fff7d9;
+  background: #ffffff;
   color: var(--color-text-strong);
   cursor: pointer;
   text-align: center;
@@ -901,8 +901,8 @@ fieldset.field {
 
 .priority-chip.is-active {
   background: var(--color-button);
-  border-color: var(--color-button);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 2px rgba(253, 214, 81, 0.45);
 }
 
 .payment-methods {
@@ -918,26 +918,43 @@ fieldset.field {
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: none;
-  background: var(--color-button);
-  color: var(--color-button-text);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fffefb;
+  color: var(--color-text-strong);
 }
 
 .payment-card.is-active {
+  border-color: var(--color-button);
+  box-shadow: 0 0 0 2px rgba(253, 214, 81, 0.45);
+  background: var(--color-button);
   transform: translateY(-2px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+  color: var(--color-button-text);
 }
 
 .payment-card__icon {
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(253, 214, 81, 0.25);
   display: grid;
   place-items: center;
   font-weight: 700;
   color: var(--color-text-strong);
+}
+
+.payment-card.is-active .payment-card__icon {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-strong);
+}
+
+.payment-card.is-active .payment-card__name,
+.payment-card.is-active .payment-card__desc {
+  color: var(--color-button-text);
 }
 
 .payment-card__text {
