@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .find-room {
   position: relative;
-  min-height: 100dvh;
+  height: 100dvh;
   background: #f5f5f5;
   color: #1f2937;
   overflow: hidden;
@@ -384,8 +384,8 @@ onBeforeUnmount(() => {
 .sheet__toggle {
   margin-left: auto;
   border: none;
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
+  background: rgba(250, 204, 21, 0.15);
+  color: #ca8a04;
   font-weight: 600;
   font-size: 13px;
   padding: 8px 12px;
@@ -395,14 +395,15 @@ onBeforeUnmount(() => {
 }
 
 .sheet__toggle:hover {
-  background: rgba(37, 99, 235, 0.2);
-  color: #1d4ed8;
+  background: rgba(250, 184, 0, 0.3);
+  color: #a16207;
 }
 
 .sheet__list {
   flex: 1;
   overflow-y: auto;
   padding: clamp(6px, 1.6vw, 10px) clamp(18px, 4vw, 26px) clamp(18px, 3.6vw, 26px);
+  padding-bottom: calc(var(--tab-h) + clamp(18px, 3.6vw, 26px));
   display: grid;
   gap: clamp(12px, 2.6vw, 18px);
 }
@@ -420,9 +421,9 @@ onBeforeUnmount(() => {
 .room-card {
   padding: clamp(16px, 3.4vw, 20px) clamp(16px, 3.4vw, 22px);
   border-radius: 20px;
-  border: 1px solid rgba(37, 99, 235, 0.14);
-  background: rgba(248, 250, 255, 0.86);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  background: rgba(255, 251, 235, 0.92);
+  box-shadow: 0 12px 24px rgba(202, 138, 4, 0.18);
   display: grid;
   gap: 12px;
   cursor: pointer;
@@ -431,13 +432,13 @@ onBeforeUnmount(() => {
 
 .room-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 16px 28px rgba(202, 138, 4, 0.28);
 }
 
 .room-card--active {
-  border-color: rgba(37, 99, 235, 0.4);
-  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.18);
-  background: rgba(219, 234, 254, 0.9);
+  border-color: rgba(217, 119, 6, 0.75);
+  box-shadow: 0 20px 40px rgba(202, 138, 4, 0.4);
+  background: rgba(254, 240, 138, 0.95);
 }
 
 .room-card__header {
@@ -456,8 +457,8 @@ onBeforeUnmount(() => {
 .room-card__seats {
   font-size: 13px;
   font-weight: 600;
-  color: #1d4ed8;
-  background: rgba(37, 99, 235, 0.1);
+  color: #b45309;
+  background: rgba(251, 191, 36, 0.3);
   border-radius: 999px;
   padding: 6px 12px;
 }
@@ -496,8 +497,8 @@ onBeforeUnmount(() => {
 
 .room-card__tags span {
   font-size: 12px;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+  color: #d97706;
+  background: rgba(251, 191, 36, 0.25);
   padding: 6px 10px;
   border-radius: 999px;
 }
@@ -513,4 +514,5 @@ onBeforeUnmount(() => {
     max-width: 860px;
   }
 }
+
 </style>

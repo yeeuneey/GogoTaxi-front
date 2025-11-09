@@ -25,15 +25,23 @@ const hideBottomTab = computed(() => {
   return Boolean(route.meta?.hideBottomNav)
 })
 
-const contentStyle = computed(() =>
-  hideBottomTab.value
-    ? {
-        paddingBottom: '0',
-        minHeight: 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))',
-        height: 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))',
-      }
-    : {},
-)
+const lockContentScroll = computed(() => Boolean(route.meta?.lockScroll))
+
+const contentStyle = computed(() => {
+  const style: Record<string, string> = {}
+  if (hideBottomTab.value) {
+    const viewportHeight = 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))'
+    style.paddingBottom = '0'
+    style.minHeight = viewportHeight
+    style.height = viewportHeight
+  }
+  if (lockContentScroll.value) {
+    style.overflow = 'hidden'
+    style.overflowY = 'hidden'
+    style.WebkitOverflowScrolling = 'auto'
+  }
+  return style
+})
 </script>
 
 <style>
