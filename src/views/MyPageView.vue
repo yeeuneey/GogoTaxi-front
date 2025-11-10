@@ -4,6 +4,10 @@
       <section class="profile-block">
         <div class="avatar">
           <img :src="profileImage" alt="profile image" />
+          <span v-if="genderIconSrc" class="avatar__badge">
+            <span class="sr-only">{{ genderIconAlt }}</span>
+            <img :src="genderIconSrc" alt="" aria-hidden="true" />
+          </span>
         </div>
         <div class="profile-info">
           <span class="profile-name">{{ displayNickname }}</span>
@@ -41,6 +45,8 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import editIcon from "@/assets/edit.svg";
 import profileImage from "@/assets/user.svg";
+import maleBadge from "@/assets/male.svg";
+import femaleBadge from "@/assets/female.svg";
 
 const router = useRouter();
 
@@ -52,11 +58,16 @@ const labels = {
   noNickname: "\uB2C9\uB124\uC784 \uBBF8\uB4F1\uB85D",
   noPhone: "\uC5F0\uB77D\uCC98 \uBBF8\uB4F1\uB85D",
   openSettings: "\uD504\uB85C\uD544 \uC218\uC815 \uD398\uC774\uC9C0 \uC774\uB3D9",
+  maleBadge: "\uB0A8\uC131 \uD504\uB85C\uD544",
+  femaleBadge: "\uC5EC\uC131 \uD504\uB85C\uD544",
 };
+
+type GenderValue = "male" | "female" | "M" | "F" | "\uB0A8\uC131" | "\uC5EC\uC131" | "";
 
 const user = ref({
   nickname: "\uAE40\uC608\uC740",
   phone: "010-1234-5678",
+  gender: "\uC5EC\uC131" as GenderValue,
 });
 
 const displayNickname = computed(() => {
@@ -67,6 +78,20 @@ const displayNickname = computed(() => {
 const displayPhone = computed(() => {
   const phone = user.value.phone?.trim();
   return phone?.length ? phone : labels.noPhone;
+});
+
+const genderIconSrc = computed(() => {
+  const normalized = user.value.gender?.toString().trim().toLowerCase();
+  if (["female", "f", "\uc5ec\uc131"].includes(normalized)) return femaleBadge;
+  if (["male", "m", "\ub0a8\uc131"].includes(normalized)) return maleBadge;
+  return "";
+});
+
+const genderIconAlt = computed(() => {
+  const normalized = user.value.gender?.toString().trim().toLowerCase();
+  if (["female", "f", "\uc5ec\uc131"].includes(normalized)) return labels.femaleBadge;
+  if (["male", "m", "\ub0a8\uc131"].includes(normalized)) return labels.maleBadge;
+  return "";
 });
 
 const routeNameMap: Record<string, string> = {
@@ -121,12 +146,32 @@ const openProfileSettings = () => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  position: relative;
 }
 
 .avatar img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.avatar__badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.avatar__badge img {
+  width: 18px;
+  height: 18px;
 }
 
 .profile-info {
@@ -252,6 +297,13 @@ const openProfileSettings = () => {
     width: 64px;
     height: 64px;
     align-self: center;
+  }
+
+  .avatar__badge {
+    width: 24px;
+    height: 24px;
+    right: -3px;
+    bottom: -3px;
   }
 
   .avatar img {
