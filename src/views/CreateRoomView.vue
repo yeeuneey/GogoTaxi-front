@@ -1040,6 +1040,8 @@ fieldset.field {
   gap: 0.75rem;
   flex-wrap: nowrap;
   overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.35rem 0.4rem;
 }
 
 .priority-chip {
@@ -1087,7 +1089,7 @@ fieldset.field {
   gap: 0.85rem;
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding: 0 0.2rem;
+  padding: 0.4rem 0.2rem 0.6rem;
   margin: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
