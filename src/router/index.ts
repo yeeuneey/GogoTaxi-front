@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // 페이지 import
-import MainPageView from '@/views/MainPageView.vue'
 import UserLoginView from '@/views/UserLoginView.vue'
 import UserRegisterView from '@/views/UserRegisterView.vue'
 import FindAccountView from '@/views/FindAccountView.vue'
@@ -23,7 +22,12 @@ const routes = [
     component: () => import('@/views/SplitPaymentView.vue'),
     meta: { requiresAuth: true, flushBottomNav: true, lockScroll: true },
   },
-  { path: '/home', name: 'home', component: MainPageView, meta: { requiresAuth: true } },
+  {
+    path: '/home',
+    name: 'home',
+    component: () => import('@/views/MainPageView.vue'),
+    meta: { requiresAuth: true },
+  },
   {
     path: '/find-room',
     name: 'find-room',
