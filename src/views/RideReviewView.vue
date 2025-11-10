@@ -260,14 +260,18 @@ function submitReport() {
 
 <style scoped>
 .review {
-  min-height: calc(100dvh - var(--header-h));
+  min-height: max(
+    0px,
+    calc(100dvh - var(--header-h) - var(--tab-h) - var(--safe-bottom) - var(--browser-ui-bottom))
+  );
   background: radial-gradient(circle at 20% 20%, rgba(255, 243, 210, 0.35), transparent 55%),
     radial-gradient(circle at 80% 15%, rgba(186, 214, 255, 0.3), transparent 55%),
     linear-gradient(180deg, #f3ede3 0%, #ffffff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(80px, 12vh, 140px) clamp(16px, 5vw, 40px);
+  padding: clamp(80px, 12vh, 140px) clamp(16px, 5vw, 40px) calc(80px + var(--safe-bottom));
+  box-sizing: border-box;
 }
 .review-card {
   width: min(560px, 100%);
