@@ -188,7 +188,7 @@ async function googleLogin() {
   border-radius: 12px;
   border: 1px solid #e3e6ec;
   outline: none;
-  font-size: 14px;
+  font-size: 16px;
   background: #fafbff;
 }
 

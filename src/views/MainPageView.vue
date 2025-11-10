@@ -147,10 +147,16 @@
                   <ellipse class="map-pebble" cx="258" cy="428" rx="4" ry="3" />
                 </g>
                 <g class="map-house" transform="translate(560 300)">
-                  <rect x="-14" y="10" width="28" height="20" rx="4" />
-                  <path d="M -18 10 L 0 -4 L 18 10 Z" />
-                  <rect class="map-house__door" x="-4" y="18" width="8" height="12" rx="2" />
-                  <rect class="map-house__window" x="6" y="16" width="8" height="6" rx="1.5" />
+                  <image
+                    class="map-house-image"
+                    :href="houseImage"
+                    :xlink:href="houseImage"
+                    x="-48"
+                    y="-52"
+                    width="112"
+                    height="112"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
                 </g>
               </g>
 
@@ -272,6 +278,7 @@ import { useRouter } from 'vue-router'
 import logoMake from '@/assets/logo_make.png'
 import logoFind from '@/assets/logo_find.png'
 import logoMy from '@/assets/logo_my.png'
+import houseImage from '@/assets/house.png'
 import { notices } from '@/components/notices'
 
 const router = useRouter()
@@ -419,28 +426,15 @@ function goLatestNotice() {
 }
 .map-ornaments {
   fill: none;
+  pointer-events: none;
 }
 .map-pebble {
   fill: #d9cec0;
   stroke: rgba(64, 49, 32, 0.35);
   stroke-width: 2;
 }
-.map-house rect,
-.map-house path {
-  fill: #f5d2b0;
-  stroke: rgba(107, 74, 40, 0.7);
-  stroke-width: 2;
-  stroke-linejoin: round;
-}
-.map-house path {
-  fill: #d87733;
-}
-.map-house__door {
-  fill: #8a4a24;
-}
-.map-house__window {
-  fill: #fff7e6;
-  stroke: none;
+.map-house-image {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
 }
 .menu-point {
   cursor: pointer;
