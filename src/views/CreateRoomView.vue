@@ -270,6 +270,28 @@ type SelectedPlace = {
   position: { lat: number; lng: number }
 }
 
+function getCurrentSeoulTime() {
+  try {
+    const formatter = new Intl.DateTimeFormat('ko-KR', {
+      timeZone: 'Asia/Seoul',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const parts = formatter.formatToParts(new Date())
+    const hour = parts.find((part) => part.type === 'hour')?.value ?? '00'
+    const minute = parts.find((part) => part.type === 'minute')?.value ?? '00'
+    return `${hour}:${minute}`
+  } catch {
+    const now = new Date()
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000
+    const seoul = new Date(utc + 9 * 60 * 60000)
+    const hour = seoul.getUTCHours().toString().padStart(2, '0')
+    const minute = seoul.getUTCMinutes().toString().padStart(2, '0')
+    return `${hour}:${minute}`
+  }
+}
+
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }
 const periodOptions = ['오전', '오후'] as const
 const hourOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'] as const
@@ -300,7 +322,7 @@ const form = reactive({
   title: '',
   departure: null as SelectedPlace | null,
   arrival: null as SelectedPlace | null,
-  departureTime: '',
+  departureTime: getCurrentSeoulTime(),
   priority: 'time' as Priority,
   paymentMethod: '',
 })
@@ -333,6 +355,7 @@ const timePickerVisible = ref(false)
 const timePickerPeriod = ref<'오전' | '오후'>('오전')
 const timePickerHour = ref('08')
 const timePickerMinute = ref('00')
+setTimePickerState(form.departureTime)
 
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -375,9 +398,12 @@ function formatShortTime(value: string) {
 }
 
 function setTimePickerState(value: string) {
-  const [hourToken, minuteToken] = value.split(':')
-  let hours = Number(hourToken)
-  if (Number.isNaN(hours)) hours = 8
+  const safeValue = value && value.includes(':') ? value : getCurrentSeoulTime()
+  const [hourToken, minuteToken] = safeValue.split(':')
+  const hours = Number(hourToken)
+  if (Number.isNaN(hours)) {
+    return setTimePickerState(getCurrentSeoulTime())
+  }
   const period = hours >= 12 ? '오후' : '오전'
   let hour12 = hours % 12
   if (hour12 === 0) hour12 = 12
@@ -578,7 +604,7 @@ async function confirmMapPicker() {
 }
 
 function openTimePicker() {
-  setTimePickerState(form.departureTime || '08:00')
+  setTimePickerState(form.departureTime || getCurrentSeoulTime())
   timePickerVisible.value = true
 }
 
@@ -662,7 +688,8 @@ function resetForm() {
   form.title = ''
   form.departure = null
   form.arrival = null
-  form.departureTime = ''
+  form.departureTime = getCurrentSeoulTime()
+  setTimePickerState(form.departureTime)
   form.priority = 'time'
   departureQuery.value = ''
   arrivalQuery.value = ''
@@ -718,6 +745,7 @@ function submitForm() {
   --color-background: #ffffff;
   --color-surface: #eeeff2;
   --color-border: #d7d8de;
+  --color-accent-border: #f4c145;
   --color-text-strong: #2f1c03;
   --color-text-muted: #6a5f4d;
   --color-button: #fdd651;
@@ -774,7 +802,8 @@ fieldset.field,
 }
 
 .page-header__description--inline {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -919,6 +948,7 @@ fieldset.field {
   display: flex;
   gap: 0.75rem;
   flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .priority-chip {
@@ -927,7 +957,7 @@ fieldset.field {
 
 .priority-chip {
   border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
   padding: 0.75rem 1rem;
   background: #ffffff;
   color: var(--color-text-strong);
@@ -942,8 +972,9 @@ fieldset.field {
 
 .priority-chip.is-active {
   background: var(--color-button);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 0 0 2px rgba(253, 214, 81, 0.45);
+  border-color: var(--color-accent-border);
+  box-shadow: 0 0 0 2px rgba(244, 193, 69, 0.45);
+  color: var(--color-button-text);
 }
 
 .payment-methods {
@@ -964,14 +995,14 @@ fieldset.field {
     box-shadow 0.2s ease,
     border-color 0.2s ease,
     background 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
   background: #fffefb;
   color: var(--color-text-strong);
 }
 
 .payment-card.is-active {
-  border-color: var(--color-button);
-  box-shadow: 0 0 0 2px rgba(253, 214, 81, 0.45);
+  border-color: var(--color-accent-border);
+  box-shadow: 0 0 0 2px rgba(244, 193, 69, 0.45);
   background: var(--color-button);
   transform: translateY(-2px);
   color: var(--color-button-text);
@@ -1019,28 +1050,37 @@ fieldset.field {
 }
 
 .primary-button,
-.ghost-button,
-.map-picker__actions .ghost-button,
-.map-picker__actions .primary-button {
-  background: var(--color-button);
-  color: var(--color-button-text);
-  border: none;
+.ghost-button {
   border-radius: 999px;
   padding: 0.9rem 2.2rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-button {
+  background: var(--color-button);
+  color: var(--color-button-text);
+  border: none;
+  box-shadow: 0 12px 20px rgba(253, 214, 81, 0.35);
+}
+
+.ghost-button {
+  background: #ffffff;
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
 }
 
 .reset-button {
-  background: linear-gradient(135deg, #ff9c8b 0%, #ff775f 100%);
+  background: #ff6b6b;
+  border-color: #ff6b6b;
   color: #ffffff;
-  box-shadow: 0 16px 26px rgba(255, 119, 95, 0.28);
+  box-shadow: 0 18px 28px rgba(255, 107, 107, 0.32);
 }
 
 .reset-button:not(:disabled):hover {
-  box-shadow: 0 18px 30px rgba(255, 119, 95, 0.35);
+  box-shadow: 0 20px 34px rgba(255, 107, 107, 0.38);
 }
 
 .primary-button:disabled,
@@ -1068,17 +1108,17 @@ fieldset.field {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(4px);
 }
 
 .map-picker__panel {
+  width: min(720px, 94vw);
   padding: 1.6rem;
   border-radius: 32px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
   position: relative;
   z-index: 1;
@@ -1110,16 +1150,7 @@ fieldset.field {
 }
 
 .map-picker__actions .ghost-button {
-  background: #ffffff;
-  color: var(--color-text-strong);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.map-picker__actions .ghost-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.12);
 }
 
 .time-picker {
@@ -1135,7 +1166,6 @@ fieldset.field {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(4px);
 }
 
 .time-picker__panel {
@@ -1178,7 +1208,7 @@ fieldset.field {
   gap: 0.5rem;
   font-size: 1.4rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #fffdf7, #fff4d4);
+  background: #fff4d4;
 }
 
 .time-display__period {
