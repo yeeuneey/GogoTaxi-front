@@ -196,25 +196,45 @@
       <div class="time-picker__panel" role="dialog" aria-modal="true">
         <header class="time-picker__header">
           <h3>출발 시간을 선택하세요</h3>
-          <p>아래 입력 또는 추천 시간 버튼으로 설정할 수 있어요.</p>
+          <p>아래 옵션에서 원하는 시간을 직접 선택해 주세요.</p>
         </header>
         <div class="time-picker__body">
-          <input
-            class="time-picker__input"
-            type="time"
-            step="60"
-            v-model="timePickerValue"
-          />
-          <div class="time-picker__presets">
-            <button
-              v-for="preset in quickTimeOptions"
-              :key="preset"
-              type="button"
-              class="time-preset"
-              @click="timePickerValue = preset"
-            >
-              {{ preset }}
-            </button>
+          <div class="time-picker__display">
+            <span class="time-display__period">{{ timePickerPeriod }}</span>
+            <span class="time-display__clock">{{ timePickerHour }}:{{ timePickerMinute }}</span>
+          </div>
+          <div class="time-picker__selectors">
+            <div class="time-column time-column--period">
+              <p>구분</p>
+              <div class="chip-group">
+                <button
+                  v-for="option in periodOptions"
+                  :key="option"
+                  type="button"
+                  class="selector-chip"
+                  :class="{ 'is-active': timePickerPeriod === option }"
+                  @click="timePickerPeriod = option"
+                >
+                  {{ option }}
+                </button>
+              </div>
+            </div>
+            <div class="time-column">
+              <p>시간</p>
+              <select class="time-select" v-model="timePickerHour">
+                <option v-for="hour in hourOptions" :key="hour" :value="hour">
+                  {{ hour }}
+                </option>
+              </select>
+            </div>
+            <div class="time-column">
+              <p>분</p>
+              <select class="time-select" v-model="timePickerMinute">
+                <option v-for="minute in minuteOptions" :key="minute" :value="minute">
+                  {{ minute }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
         <footer class="time-picker__actions">
@@ -251,7 +271,9 @@ type SelectedPlace = {
 }
 
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }
-const quickTimeOptions = ['06:00', '07:00', '08:00', '09:00', '10:00', '18:00'] as const
+const periodOptions = ['오전', '오후'] as const
+const hourOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'] as const
+const minuteOptions = Array.from({ length: 60 }, (_, idx) => idx.toString().padStart(2, '0')) as string[]
 const router = useRouter()
 
 const ownedPaymentMethods = getUserPaymentMethods('credit-card')
@@ -308,7 +330,9 @@ const mapPickerTarget = ref<FieldKind | null>(null)
 const mapPickerCanvas = ref<HTMLDivElement | null>(null)
 const mapPickerPosition = reactive({ ...DEFAULT_CENTER })
 const timePickerVisible = ref(false)
-const timePickerValue = ref<string>('08:00')
+const timePickerPeriod = ref<'오전' | '오후'>('오전')
+const timePickerHour = ref('08')
+const timePickerMinute = ref('00')
 
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -340,9 +364,32 @@ const distanceLabel = computed(() => {
   return `${estimatedDistanceKm.value.toFixed(1)}km`
 })
 
+function formatShortTime(value: string) {
+  const [hourToken, minuteToken] = value.split(':')
+  const hours = Number(hourToken)
+  if (Number.isNaN(hours)) return value
+  const period = hours >= 12 ? '오후' : '오전'
+  let hour12 = hours % 12
+  if (hour12 === 0) hour12 = 12
+  return `${period} ${hour12.toString().padStart(2, '0')}:${minuteToken ?? '00'}`
+}
+
+function setTimePickerState(value: string) {
+  const [hourToken, minuteToken] = value.split(':')
+  let hours = Number(hourToken)
+  if (Number.isNaN(hours)) hours = 8
+  const period = hours >= 12 ? '오후' : '오전'
+  let hour12 = hours % 12
+  if (hour12 === 0) hour12 = 12
+  timePickerPeriod.value = period
+  timePickerHour.value = hour12.toString().padStart(2, '0')
+  const minuteCandidate = (minuteToken ?? '00').padStart(2, '0')
+  timePickerMinute.value = minuteOptions.includes(minuteCandidate) ? minuteCandidate : '00'
+}
+
 const displayDepartureTime = computed(() => {
   if (!form.departureTime) return '출발 시간을 선택해주세요'
-  return form.departureTime
+  return formatShortTime(form.departureTime)
 })
 
 let kakaoApi: KakaoNamespace | null = null
@@ -531,7 +578,7 @@ async function confirmMapPicker() {
 }
 
 function openTimePicker() {
-  timePickerValue.value = form.departureTime || '08:00'
+  setTimePickerState(form.departureTime || '08:00')
   timePickerVisible.value = true
 }
 
@@ -540,7 +587,11 @@ function closeTimePicker() {
 }
 
 function confirmTimePicker() {
-  form.departureTime = timePickerValue.value
+  let hour = Number(timePickerHour.value)
+  if (timePickerPeriod.value === '오후' && hour !== 12) hour += 12
+  if (timePickerPeriod.value === '오전' && hour === 12) hour = 0
+  const hourString = hour.toString().padStart(2, '0')
+  form.departureTime = `${hourString}:${timePickerMinute.value}`
   timePickerVisible.value = false
 }
 
@@ -1117,35 +1168,94 @@ fieldset.field {
   gap: 0.85rem;
 }
 
-.time-picker__input {
-  width: 100%;
-  border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 0.85rem 1rem;
-  font-size: 1.1rem;
-  text-align: center;
-  background: #fefefe;
-}
-
-.time-picker__presets {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+.time-picker__display {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 0.9rem 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
   gap: 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fffdf7, #fff4d4);
 }
 
-.time-preset {
-  border: none;
-  border-radius: 14px;
-  background: #fff6d5;
-  color: var(--color-text-strong);
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
+.time-display__period {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.time-picker__selectors {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.time-column {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.time-column p {
+  margin: 0;
   font-weight: 600;
-  transition: background 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
 }
 
-.time-preset:hover {
-  background: #fde7a3;
+.chip-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.selector-chip {
+  flex: 1;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.5rem 0.7rem;
+  background: #f7f8fd;
+  color: var(--color-text-strong);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.selector-chip.is-active {
+  background: var(--color-button);
+  color: var(--color-button-text);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+}
+
+.time-select {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #f8f9ff;
+  color: var(--color-text-strong);
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #c4c7d1 50%),
+    linear-gradient(135deg, #c4c7d1 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 4px),
+    calc(100% - 12px) calc(50% - 4px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: var(--color-button);
+  box-shadow: 0 0 0 3px rgba(253, 214, 81, 0.35);
 }
 
 .time-picker__actions {
