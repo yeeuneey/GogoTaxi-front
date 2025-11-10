@@ -494,7 +494,7 @@ const submitNewCard = () => {
   cardFormError.value = ''
 
   if (addDisabled.value) {
-    cardFormError.value = '모든 필드를 올바르게 입력해주세요.'
+    cardFormError.value = '모든 필드를 올바르게 입력해 주세요.'
     return
   }
 

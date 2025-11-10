@@ -11,7 +11,7 @@
       </header>
 
       <div class="rating">
-        <p class="rating__label">별점을 선택해주세요</p>
+        <p class="rating__label">별점을 선택해 주세요.</p>
         <div class="rating__stars" role="radiogroup" aria-label="별점 선택">
           <button
             v-for="star in stars"
@@ -44,7 +44,7 @@
         <textarea
           v-model="comment"
           rows="5"
-          placeholder="친절함, 안전운전, 차량 상태 등 자유롭게 작성해주세요."
+          placeholder="친절함, 안전운전, 차량 상태 등 자유롭게 작성해 주세요."
         />
       </label>
 
@@ -60,7 +60,7 @@
       <div v-if="reportOpen" class="report-overlay" role="dialog" aria-modal="true">
         <div class="report-card">
           <header class="report-card__header">
-            <h2>신고할 좌석을 선택해주세요</h2>
+            <h2>신고할 좌석을 선택해 주세요.</h2>
             <button type="button" class="report-close" @click="closeReport" aria-label="신고 창 닫기">
               ×
             </button>
@@ -127,7 +127,7 @@
               />
             </div>
             <p v-else key="report-hint" class="report-form__hint">
-              좌석을 먼저 선택하면 신고 내용을 작성할 수 있어요.
+              좌석을 선택한 후 신고 내용을 작성해 주세요.
             </p>
           </transition>
           <footer class="report-card__actions">
@@ -260,6 +260,10 @@ function submitReport() {
 
 <style scoped>
 .review {
+  height: max(
+    0px,
+    calc(100dvh - var(--header-h) - var(--tab-h) - var(--safe-bottom) - var(--browser-ui-bottom))
+  );
   min-height: max(
     0px,
     calc(100dvh - var(--header-h) - var(--tab-h) - var(--safe-bottom) - var(--browser-ui-bottom))
@@ -270,7 +274,7 @@ function submitReport() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(80px, 12vh, 140px) clamp(16px, 5vw, 40px) calc(80px + var(--safe-bottom));
+  padding: clamp(48px, 8vh, 90px) clamp(16px, 5vw, 40px);
   box-sizing: border-box;
 }
 .review-card {
@@ -283,6 +287,7 @@ function submitReport() {
   display: grid;
   gap: clamp(24px, 4vw, 32px);
   position: relative;
+  margin-bottom: var(--safe-bottom);
 }
 .review-header {
   display: flex;

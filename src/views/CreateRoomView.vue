@@ -422,7 +422,7 @@ function setTimePickerState(value: string) {
 }
 
 const displayDepartureTime = computed(() => {
-  if (!form.departureTime) return '출발 시간을 선택해주세요'
+  if (!form.departureTime) return '출발 시간을 선택해 주세요.'
   return formatShortTime(form.departureTime)
 })
 

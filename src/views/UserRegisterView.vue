@@ -80,7 +80,7 @@ const terms = ref(false)
 
 function checkId() {
   if (!userid.value) {
-    alert('아이디를 입력해주세요.')
+    alert('아이디를 입력해 주세요.')
     return
   }
   alert(`'${userid.value}' 아이디는 사용 가능한 예시입니다.`)
@@ -88,7 +88,7 @@ function checkId() {
 
 function submit() {
   if (!name.value || !userid.value || !pw.value || !pw2.value) {
-    alert('필수 정보를 입력해주세요.')
+    alert('필수 정보를 입력해 주세요.')
     return
   }
   if (pw.value !== pw2.value) {
