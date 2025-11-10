@@ -323,7 +323,10 @@ const minuteOptions = Array.from({ length: 60 }, (_, idx) => idx.toString().padS
 const router = useRouter()
 
 const availablePaymentMethods: StoredPaymentMethod[] = createPaymentSections().flatMap((section) =>
-  section.items.map((item) => ({ ...item })),
+  section.items.map((item) => ({
+    ...item,
+    label: item.label.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s{2,}/g, ' ').trim(),
+  })),
 )
 const selectedPaymentMethodId = ref<string>(availablePaymentMethods[0]?.id ?? '')
 
@@ -1139,12 +1142,12 @@ fieldset.field {
 }
 
 .payment-card {
-  padding: 0.9rem 1rem;
-  border-radius: 20px;
+  padding: 0.85rem 0.9rem;
+  border-radius: 18px;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-width: clamp(180px, 70vw, 240px);
+  gap: 0.6rem;
+  min-width: clamp(150px, 60vw, 210px);
   scroll-snap-align: start;
   flex: 0 0 auto;
   cursor: pointer;
