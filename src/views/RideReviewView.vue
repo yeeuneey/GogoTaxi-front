@@ -60,9 +60,6 @@
       <div v-if="reportOpen" class="report-overlay" role="dialog" aria-modal="true">
         <section class="seat-select seat-select--report">
           <div class="seat-card">
-            <button type="button" class="seat-card__close" aria-label="신고 창 닫기" @click="closeReport">
-              ×
-            </button>
             <header class="seat-card__header seat-card__header--report">
               <h2>신고할 좌석을 선택해 주세요.</h2>
               <p class="seat-card__desc">
@@ -484,25 +481,6 @@ function submitReport() {
   display: grid;
   gap: 18px;
   color: #4b2c00;
-}
-.seat-card__close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: none;
-  background: rgba(59, 39, 6, 0.08);
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  color: #7c4b00;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.seat-card__close:hover {
-  background: rgba(59, 39, 6, 0.14);
-  transform: translateY(-1px);
 }
 .seat-card__header {
   text-align: center;
