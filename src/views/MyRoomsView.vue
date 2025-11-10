@@ -46,13 +46,7 @@
     </section>
 
     <section v-else class="room-empty">
-      <div class="room-empty__card">
-        <p class="room-empty__title">아직 참여한 방이 없어요.</p>
-        <p class="room-empty__desc">
-          방찾기에서 마음에 드는 방을 들어가면 이곳에서 바로 확인할 수 있어요.
-        </p>
-        <button type="button" class="btn btn--primary" @click="goFindRoom">방 찾으러 가기</button>
-      </div>
+      <p class="room-empty__title">아직 참여한 방이 없어요.</p>
     </section>
   </section>
 </template>
@@ -132,14 +126,13 @@ function dropRoom(roomId: string) {
 
 <style scoped>
 .my-rooms {
-  min-height: calc(100dvh - var(--header-h, 0px));
-  padding: clamp(28px, 6vw, 60px) clamp(18px, 5vw, 54px) clamp(34px, 6vh, 60px);
-  padding-bottom: calc(var(--tab-h, 64px) + clamp(24px, 4vh, 48px));
-  margin-bottom: calc(-1 * var(--tab-h, 64px));
+  min-height: calc(100dvh - var(--header-h, 0px) - var(--tab-h, 64px));
+  padding: clamp(28px, 6vw, 60px) clamp(18px, 5vw, 54px) clamp(28px, 5vh, 48px);
   background: #fff7e1;
   color: #3b2600;
   display: grid;
   gap: 28px;
+  grid-template-rows: auto 1fr;
   align-content: start;
 }
 
@@ -306,26 +299,15 @@ function dropRoom(roomId: string) {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
-}
-
-.room-empty__card {
-  background: #fff;
-  border-radius: 24px;
-  padding: clamp(24px, 5vw, 36px);
-  border: 1px solid #f3d193;
+  min-height: 0;
   text-align: center;
-  max-width: 420px;
 }
 
 .room-empty__title {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 20px;
-  color: #3b2600;
-}
-
-.room-empty__desc {
-  margin: 0 0 18px;
+  line-height: 1.6;
+  font-weight: 600;
   color: #a16207;
 }
 </style>

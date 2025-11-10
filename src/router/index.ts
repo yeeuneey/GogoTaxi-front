@@ -38,7 +38,7 @@ const routes = [
     path: '/my-rooms',
     name: 'my-rooms',
     component: () => import('@/views/MyRoomsView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, flushBottomNav: true },
   },
   {
     path: '/mypage',
