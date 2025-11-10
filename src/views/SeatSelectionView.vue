@@ -62,7 +62,6 @@
       </transition>
 
       <footer class="seat-card__actions">
-        <button type="button" class="btn btn--ghost" @click="goBackHome">나중에 할게요</button>
         <button type="button" class="btn btn--primary" :disabled="!selectedSeat" @click="confirmSeat">
           좌석 확정하기
         </button>
@@ -100,10 +99,6 @@ function seatStyle(seat: SeatInfo) {
 
 function selectSeat(seatNumber: number) {
   selectedSeat.value = seatNumber
-}
-
-function goBackHome() {
-  router.push({ name: 'home' })
 }
 
 function confirmSeat() {
@@ -160,7 +155,7 @@ function confirmSeat() {
 }
 .seat-layout {
   position: relative;
-  width: min(300px, 100%);
+  width: min(240px, 94%);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
 }
@@ -181,9 +176,9 @@ function confirmSeat() {
 .seat-marker {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: clamp(44px, 16vw, 56px);
-  height: clamp(52px, 18vw, 66px);
-  border-radius: 16px;
+  width: clamp(38px, 14vw, 48px);
+  height: clamp(46px, 16vw, 58px);
+  border-radius: 14px;
   border: 2px solid rgba(37, 99, 235, 0.16);
   box-shadow: 0 14px 24px rgba(15, 23, 42, 0.2);
   background:
@@ -244,14 +239,6 @@ function confirmSeat() {
   opacity: 0.4;
   transform: none;
   box-shadow: none;
-}
-.btn--ghost {
-  background: rgba(79, 67, 56, 0.1);
-  color: #4f4338;
-}
-.btn--ghost:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(79, 67, 56, 0.16);
 }
 .btn--primary {
   background: linear-gradient(135deg, #2563eb, #3b82f6);

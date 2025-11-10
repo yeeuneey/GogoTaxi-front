@@ -482,7 +482,7 @@ function submitReport() {
 }
 .seat-layout {
   position: relative;
-  width: min(300px, 100%);
+  width: min(240px, 94%);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
 }
@@ -503,9 +503,9 @@ function submitReport() {
 .seat-marker {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: clamp(44px, 16vw, 56px);
-  height: clamp(52px, 18vw, 66px);
-  border-radius: 16px;
+  width: clamp(38px, 14vw, 48px);
+  height: clamp(46px, 16vw, 58px);
+  border-radius: 14px;
   border: 2px solid rgba(37, 99, 235, 0.16);
   box-shadow: 0 14px 24px rgba(15, 23, 42, 0.2);
   background:
@@ -532,7 +532,7 @@ function submitReport() {
   color: #c2410c;
 }
 .seat-marker--rear-center {
-  width: clamp(50px, 20vw, 70px);
+  width: clamp(44px, 16vw, 60px);
 }
 .seat-marker--active {
   background: linear-gradient(150deg, #2563eb, #3b82f6);

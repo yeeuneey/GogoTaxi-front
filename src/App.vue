@@ -2,16 +2,23 @@
   <div id="app" class="app-shell">
     <AppHeader />
 
-    <main class="app-content" :style="contentStyle">
+    <main
+      class="app-content"
+      :style="hideBottomTab
+        ? { paddingBottom: '0', minHeight: 'calc(100dvh - var(--header-h))' }
+        : {}"
+    >
       <router-view />
     </main>
 
-    <BottomTab v-if="!hideBottomTab" />
+    <Teleport to="body">
+      <BottomTab v-if="!hideBottomTab" />
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import BottomTab from '@/components/BottomTab.vue'
@@ -37,27 +44,40 @@ const contentStyle = computed(() =>
 </script>
 
 <style>
-:root { --header-h: 56px; --tab-h: 64px; --app-vh: 1vh; }
-* { box-sizing: border-box; }
-html, body, #app { height: 100%; margin: 0; }
-/* 전역 스크롤바 숨김 */
-::-webkit-scrollbar { display: none; }
-html, body {
+:root {
+  --header-h: 56px;
+  --tab-h: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --browser-ui-bottom: 0px;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+/* Hide default scrollbars but keep scrollability */
+::-webkit-scrollbar {
+  display: none;
+}
+html,
+body {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
 .app-shell {
   position: relative;
-  height: calc(var(--app-vh, 1vh) * 100);
-  background: #fff;
-  overflow: hidden;
+  min-height: 100%;
+  background: #3a2e20;
 }
 .app-content {
   padding-top: var(--header-h);
-  padding-bottom: var(--tab-h); /* 기본값(탭 보일 때) */
-  height: calc((var(--app-vh, 1vh) * 100) - var(--header-h));
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--tab-h) + var(--safe-bottom) + var(--browser-ui-bottom)); /* spacing when tab is visible */
+  min-height: calc(100dvh - var(--header-h));
 }
 </style>
+
