@@ -17,7 +17,7 @@
   </section>
   <section v-else class="detail detail--empty">
     <header class="detail__header">
-      <h1>공지사항을 찾을 수 없어요</h1>
+      <h1>공지사항을 찾을 수 없어요.</h1>
       <button class="detail__back" type="button" @click="goBack">← 목록으로</button>
     </header>
   </section>

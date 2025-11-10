@@ -24,7 +24,7 @@
         <div class="sheet__title">
           <div class="sheet__title-text">
             <h1>탐색 중인 방</h1>
-            <p>{{ sortedRooms.length }}개의 방을 찾았어요</p>
+            <p>{{ sortedRooms.length }}개의 방을 찾았어요.</p>
           </div>
         </div>
         <div class="sheet__actions">

@@ -9,7 +9,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="주소를 입력해 주세요"
+          placeholder="주소를 입력해 주세요."
           @keydown.enter.prevent="searchAddress"
         />
         <button type="button" :disabled="searching" @click="searchAddress">

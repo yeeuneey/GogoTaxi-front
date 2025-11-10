@@ -5,7 +5,7 @@
       <header class="review-header">
         <img class="driver-avatar" :src="logoMy" alt="기사님 프로필" />
         <div class="review-header__txt">
-          <p class="sub">운행이 종료되었습니다</p>
+          <p class="sub">운행이 종료되었습니다.</p>
           <h1>기사님 서비스는 어떠셨나요?</h1>
         </div>
       </header>
@@ -40,16 +40,16 @@
       </div>
 
       <label class="feedback">
-        <span class="feedback__label">후기를 남겨주세요</span>
+        <span class="feedback__label">후기를 남겨 주세요.</span>
         <textarea
           v-model="comment"
           rows="5"
-          placeholder="친절함, 안전운전, 차량 상태 등 자유롭게 작성해 주세요."
+          placeholder="친절함, 안전 운전, 차량 상태 등 자유롭게 작성해 주세요."
         />
       </label>
 
       <div class="actions">
-        <button type="button" class="btn btn--ghost" @click="skip">나중에 할게요</button>
+        <button type="button" class="btn btn--ghost" @click="skip">나중에 할게요.</button>
         <button type="button" class="btn btn--primary" :disabled="!rating" @click="submit">
           후기 제출
         </button>
@@ -58,90 +58,104 @@
 
     <transition name="fade">
       <div v-if="reportOpen" class="report-overlay" role="dialog" aria-modal="true">
-        <div class="report-card">
-          <header class="report-card__header">
-            <h2>신고할 좌석을 선택해 주세요.</h2>
-            <button type="button" class="report-close" @click="closeReport" aria-label="신고 창 닫기">
+        <section class="seat-select seat-select--report">
+          <div class="seat-card">
+            <button type="button" class="seat-card__close" aria-label="신고 창 닫기" @click="closeReport">
               ×
             </button>
-          </header>
-          <p class="report-card__desc">
-            탑승 시 예약했던 좌석 번호를 기준으로 신고가 접수됩니다.
-          </p>
-          <div class="seat-layout" role="radiogroup" aria-label="좌석 선택">
-            <svg class="seat-layout__car" viewBox="0 0 200 400" aria-hidden="true">
-              <defs>
-                <linearGradient id="car-body" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#f6f7fb" />
-                  <stop offset="100%" stop-color="#e3e6ee" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M50 10 Q100 -10 150 10 L180 80 L180 320 L150 390 Q100 410 50 390 L20 320 L20 80 Z"
-                fill="url(#car-body)"
-                stroke="#cbd2e1"
-                stroke-width="3"
-              />
-              <rect x="52" y="70" width="96" height="90" rx="18" fill="#fff" stroke="#d1d7e3" />
-              <rect x="52" y="240" width="96" height="90" rx="18" fill="#fff" stroke="#d1d7e3" />
-              <line x1="100" y1="70" x2="100" y2="160" stroke="#dbe2ef" stroke-width="3" />
-              <line x1="84" y1="240" x2="84" y2="330" stroke="#dbe2ef" stroke-width="3" />
-              <line x1="116" y1="240" x2="116" y2="330" stroke="#dbe2ef" stroke-width="3" />
-              <rect x="30" y="120" width="140" height="30" rx="10" fill="#dfe4ef" />
-              <rect x="30" y="250" width="140" height="30" rx="10" fill="#dfe4ef" />
-              <circle cx="58" cy="56" r="12" fill="#dfe4ef" />
-              <circle cx="142" cy="56" r="12" fill="#dfe4ef" />
-              <circle cx="58" cy="344" r="12" fill="#dfe4ef" />
-              <circle cx="142" cy="344" r="12" fill="#dfe4ef" />
-            </svg>
+            <header class="seat-card__header seat-card__header--report">
+              <h2>신고할 좌석을 선택해 주세요.</h2>
+              <p class="seat-card__desc">
+                탑승 시 예약했던 좌석 번호를 기준으로 신고가 접수됩니다. 문제가 있었던 좌석을 선택해 신고를 이어가 주세요.
+              </p>
+            </header>
 
-            <div class="seat-layout__seats">
+            <div class="seat-layout" role="radiogroup" aria-label="좌석 선택">
+              <svg class="seat-layout__car" viewBox="0 0 200 400" aria-hidden="true">
+                <defs>
+                  <linearGradient id="car-body" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#f6f7fb" />
+                    <stop offset="100%" stop-color="#e3e6ee" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M50 10 Q100 -10 150 10 L180 80 L180 320 L150 390 Q100 410 50 390 L20 320 L20 80 Z"
+                  fill="url(#car-body)"
+                  stroke="#cbd2e1"
+                  stroke-width="3"
+                />
+                <rect x="52" y="70" width="96" height="90" rx="18" fill="#fff" stroke="#d1d7e3" />
+                <rect x="52" y="240" width="96" height="90" rx="18" fill="#fff" stroke="#d1d7e3" />
+                <line x1="100" y1="70" x2="100" y2="160" stroke="#dbe2ef" stroke-width="3" />
+                <line x1="84" y1="240" x2="84" y2="330" stroke="#dbe2ef" stroke-width="3" />
+                <line x1="116" y1="240" x2="116" y2="330" stroke="#dbe2ef" stroke-width="3" />
+                <rect x="30" y="120" width="140" height="30" rx="10" fill="#dfe4ef" />
+                <rect x="30" y="250" width="140" height="30" rx="10" fill="#dfe4ef" />
+                <circle cx="58" cy="56" r="12" fill="#dfe4ef" />
+                <circle cx="142" cy="56" r="12" fill="#dfe4ef" />
+                <circle cx="58" cy="344" r="12" fill="#dfe4ef" />
+                <circle cx="142" cy="344" r="12" fill="#dfe4ef" />
+              </svg>
+
+              <div class="seat-layout__seats">
+                <button
+                  v-for="seat in seats"
+                  :key="seat.number"
+                  type="button"
+                  class="seat-marker"
+                  :class="[
+                    seat.modifier ? 'seat-marker--' + seat.modifier : '',
+                    { 'seat-marker--active': seat.number === selectedSeat },
+                  ]"
+                  :style="seatStyle(seat)"
+                  :aria-pressed="seat.number === selectedSeat"
+                  @click="selectSeat(seat.number)"
+                >
+                  <span>{{ seat.number }}</span>
+                </button>
+              </div>
+            </div>
+
+            <transition name="fade">
+              <p v-if="selectedSeat" key="selection" class="seat-card__selection">
+                {{ selectedSeat }}번 좌석을 선택했어요. 아래 신고 내용을 작성해 주세요.
+              </p>
+              <p v-else key="selection-hint" class="seat-card__selection--hint">
+                문제가 있었던 좌석을 눌러 신고를 시작해 주세요.
+              </p>
+            </transition>
+
+            <transition name="fade">
+              <div v-if="selectedSeat !== null" key="report-form" class="report-form">
+                <label class="report-form__label" for="report-message">
+                  신고 내용<span aria-hidden="true" class="required-dot">•</span>
+                </label>
+                <textarea
+                  id="report-message"
+                  class="report-form__textarea"
+                  v-model="reportMessage"
+                  rows="3"
+                  placeholder="문제가 발생했던 상황과 이유를 구체적으로 적어 주세요."
+                />
+              </div>
+              <p v-else key="report-hint" class="report-form__hint">
+                좌석을 선택한 후 신고 내용을 작성해 주세요.
+              </p>
+            </transition>
+
+            <footer class="seat-card__actions seat-card__actions--report">
+              <button type="button" class="btn btn--ghost" @click="closeReport">취소</button>
               <button
-                v-for="seat in seats"
-                :key="seat.number"
                 type="button"
-                class="seat-marker"
-                :class="[
-                  seat.modifier ? `seat-marker--${seat.modifier}` : '',
-                  { 'seat-marker--active': seat.number === selectedSeat },
-                ]"
-                :style="seatStyle(seat)"
-                :aria-pressed="seat.number === selectedSeat"
-                @click="selectSeat(seat.number)"
+                class="btn btn--primary"
+                :disabled="!canSubmitReport"
+                @click="submitReport"
               >
-                <span>{{ seat.number }}</span>
+                신고하기
               </button>
-            </div>
+            </footer>
           </div>
-          <transition name="fade">
-            <div v-if="selectedSeat !== null" key="report-form" class="report-form">
-              <label class="report-form__label" for="report-message">
-                신고 내용<span aria-hidden="true" class="required-dot">•</span>
-              </label>
-              <textarea
-                id="report-message"
-                class="report-form__textarea"
-                v-model="reportMessage"
-                rows="3"
-                placeholder="문제가 발생한 상황과 이유를 구체적으로 적어주세요."
-              />
-            </div>
-            <p v-else key="report-hint" class="report-form__hint">
-              좌석을 선택한 후 신고 내용을 작성해 주세요.
-            </p>
-          </transition>
-          <footer class="report-card__actions">
-            <button type="button" class="btn btn--ghost" @click="closeReport">취소</button>
-            <button
-              type="button"
-              class="btn btn--primary"
-              :disabled="!canSubmitReport"
-              @click="submitReport"
-            >
-              신고하기
-            </button>
-          </footer>
-        </div>
+        </section>
       </div>
     </transition>
   </section>
@@ -451,60 +465,84 @@ function submitReport() {
 .report-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(20, 12, 6, 0.35);
+  background: rgba(59, 39, 6, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 20px;
   z-index: 2000;
 }
-.report-card {
-  width: min(380px, 96%);
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 18px;
-  box-shadow: 0 24px 48px rgba(20, 12, 6, 0.24);
+.seat-select--report {
+  width: min(520px, 96%);
+  border-radius: 32px;
+  background: radial-gradient(circle at 50% 0%, #ffe7ac, #ffe0a4 38%, #ffd88a 100%);
+  padding: clamp(24px, 4vw, 36px);
+  box-shadow: 0 28px 60px rgba(120, 72, 7, 0.25);
+}
+.seat-card {
+  position: relative;
   display: grid;
-  gap: 12px;
+  gap: 18px;
+  color: #4b2c00;
 }
-.report-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.report-card__header h2 {
-  margin: 0;
-  font-size: 17px;
-  color: #2f241b;
-}
-.report-close {
+.seat-card__close {
+  position: absolute;
+  top: 0;
+  right: 0;
   border: none;
-  background: none;
-  font-size: 22px;
+  background: rgba(59, 39, 6, 0.08);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  color: #85766a;
+  color: #7c4b00;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.report-card__desc {
+.seat-card__close:hover {
+  background: rgba(59, 39, 6, 0.14);
+  transform: translateY(-1px);
+}
+.seat-card__header {
+  text-align: center;
+  display: grid;
+  gap: 8px;
+}
+.seat-card__header h2 {
+  margin: 0;
+  font-size: clamp(22px, 4vw, 28px);
+}
+.seat-card__sub {
   margin: 0;
   font-size: 13px;
-  color: #6d6257;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(193, 98, 7, 0.85);
+}
+.seat-card__desc {
+  margin: 0;
+  color: #663703;
+  line-height: 1.5;
+  font-size: 14px;
 }
 .seat-layout {
   position: relative;
-  width: min(190px, 90%);
-  max-height: 240px;
+  width: min(240px, 94%);
   margin: 0 auto;
   aspect-ratio: 2 / 3;
+  background: #fffef8;
+  border-radius: 28px;
+  padding: 18px;
+  border: 1px solid rgba(243, 193, 76, 0.6);
 }
 .seat-layout__car {
   width: 100%;
   height: 100%;
   display: block;
-  border-radius: 32px;
-  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.45), transparent 55%);
-  filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.16));
+  border-radius: 24px;
+  background: #fffdf4;
 }
 .seat-layout__seats {
   position: absolute;
@@ -515,20 +553,18 @@ function submitReport() {
 .seat-marker {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: clamp(34px, 12vw, 44px);
-  height: clamp(40px, 14vw, 52px);
-  border-radius: 12px;
-  border: 2px solid rgba(37, 99, 235, 0.16);
-  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.2);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.95) 0%, rgba(232, 238, 255, 0.88) 100%);
+  width: clamp(38px, 14vw, 48px);
+  height: clamp(46px, 16vw, 58px);
+  border-radius: 14px;
+  border: 2px solid rgba(250, 204, 21, 0.25);
+  background: #fffdf4;
   display: grid;
   place-items: center;
   font-weight: 700;
   font-size: 16px;
-  color: #1d4ed8;
+  color: #a16207;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
   pointer-events: auto;
 }
 .seat-marker span {
@@ -536,23 +572,43 @@ function submitReport() {
 }
 .seat-marker:hover {
   transform: translate(-50%, -50%) translateY(-4px);
-  box-shadow: 0 18px 28px rgba(37, 99, 235, 0.24);
 }
 .seat-marker--driver {
-  border-color: rgba(148, 163, 184, 0.4);
-  background: linear-gradient(160deg, rgba(229, 231, 235, 0.95), rgba(209, 213, 219, 0.85));
-  color: #6b7280;
+  background: rgba(15, 23, 42, 0.08);
+  color: rgba(15, 23, 42, 0.4);
+  border-color: transparent;
   cursor: not-allowed;
   pointer-events: none;
 }
-.seat-marker--rear-center {
-  width: clamp(40px, 14vw, 54px);
-}
 .seat-marker--active {
-  background: linear-gradient(150deg, #2563eb, #3b82f6);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 20px 32px rgba(37, 99, 235, 0.32);
+  background: #facc15;
+  color: #fffdf4;
+  border-color: rgba(250, 184, 0, 0.3);
+  box-shadow: 0 14px 24px rgba(184, 134, 11, 0.35);
+}
+.seat-card__selection,
+.seat-card__selection--hint {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #7c2d12;
+  padding: 8px 0;
+}
+.seat-card__selection--hint {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #b86a1a;
+}
+.seat-card__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.seat-card__actions--report {
+  justify-content: flex-end;
 }
 .report-form {
   display: grid;
@@ -562,15 +618,15 @@ function submitReport() {
   margin: 0;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(240, 236, 229, 0.65);
-  color: #5c4c3c;
+  background: rgba(255, 248, 229, 0.9);
+  color: #7c2d12;
   font-size: 13px;
   text-align: center;
 }
 .report-form__label {
   font-size: 14px;
   font-weight: 600;
-  color: #43362a;
+  color: #7c2d12;
 }
 .required-dot {
   margin-left: 4px;
@@ -583,7 +639,7 @@ function submitReport() {
   min-height: 80px;
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(120, 92, 68, 0.2);
+  border: 1px solid rgba(184, 134, 11, 0.35);
   background: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   resize: vertical;
@@ -592,122 +648,10 @@ function submitReport() {
 }
 .report-form__textarea:focus {
   outline: none;
-  border-color: rgba(37, 99, 235, 0.45);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border-color: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
 }
-.seat-layout__body {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: clamp(16px, 2.6vw, 22px);
-}
-.seat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  justify-items: center;
-  gap: clamp(16px, 2.4vw, 24px);
-}
-.seat-row--front {
-  grid-template-columns: repeat(2, minmax(96px, 140px));
-}
-.seat-btn {
-  position: relative;
-  width: clamp(88px, 18vw, 112px);
-  height: clamp(110px, 20vw, 132px);
-  border-radius: 26px;
-  border: none;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.12);
-  display: grid;
-  place-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-.seat-btn::before {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 32%;
-  border-radius: 16px 16px 10px 10px;
-  background: rgba(59, 130, 246, 0.16);
-}
-.seat-btn::after {
-  content: '';
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  height: 38%;
-  border-radius: 12px;
-  background: rgba(59, 130, 246, 0.12);
-}
-.seat-number {
-  position: relative;
-  z-index: 1;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1d4ed8;
-}
-.seat-btn--driver .seat-number {
-  color: #ea580c;
-}
-.seat-btn--driver::after {
-  position: absolute;
-  bottom: 18px;
-  width: 68%;
-  height: 38%;
-}
-.seat-btn--driver::before {
-  position: absolute;
-  top: 14px;
-}
-.seat-btn--driver::after {
-  box-shadow: inset 0 0 0 2px rgba(249, 115, 22, 0.24);
-}
-.seat-btn--driver::before {
-  box-shadow: inset 0 0 0 2px rgba(249, 115, 22, 0.24);
-}
-.seat-btn--driver::after {
-  background: rgba(249, 115, 22, 0.18);
-}
-.seat-btn--driver::before {
-  background: rgba(249, 115, 22, 0.22);
-}
-.seat-btn--driver::after {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.seat-btn--driver::after {
-  content: '⚙';
-  color: rgba(249, 115, 22, 0.8);
-  font-size: 18px;
-}
-.seat-btn--active {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  box-shadow: 0 20px 32px rgba(37, 99, 235, 0.28);
-}
-.seat-btn--active::before,
-.seat-btn--active::after {
-  background: rgba(255, 255, 255, 0.28);
-}
-.seat-btn--active .seat-number {
-  color: #ffffff;
-}
-.seat-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 34px rgba(37, 99, 235, 0.2);
-}
-.report-card__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
+
 
 @media (max-width: 520px) {
   .star-btn {
@@ -730,6 +674,12 @@ function submitReport() {
   }
   .btn {
     width: 100%;
+  }
+  .seat-select--report {
+    padding: 22px;
+  }
+  .seat-card__actions {
+    flex-direction: column-reverse;
   }
 }
 </style>

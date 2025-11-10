@@ -1,7 +1,7 @@
 <template>
   <section class="payment">
     <header class="payment__header">
-      <p class="payment__eyebrow">같이 나눠 내요</p>
+      <p class="payment__eyebrow">같이 나눠 내요.</p>
       <h1>결제하기</h1>
       <p class="payment__sub">
         예상 금액을 확인한 뒤 결제를 진행해 주세요. 최종 금액은 인원 확정 후 바로 안내됩니다.

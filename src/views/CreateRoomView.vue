@@ -181,7 +181,7 @@
       <div class="map-picker__panel" role="dialog" aria-modal="true">
         <header class="map-picker__header">
           <h3>
-            {{ mapPickerTarget === 'arrival' ? '도착지' : '출발지' }} 위치를 지도에서 선택하세요
+            {{ mapPickerTarget === 'arrival' ? '도착지' : '출발지' }} 위치를 지도에서 선택하세요.
           </h3>
           <p>지도나 핀을 드래그해 위치를 조정하세요.</p>
         </header>
@@ -697,7 +697,7 @@ function formatDate(value: string) {
   const [hourToken, minuteToken] = value.split(':')
   const hours = Number(hourToken)
   const minutes = Number(minuteToken)
-  if (Number.isNaN(hours) || Number.isNaN(minutes)) return '유효한 시간을 선택해 주세요'
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return '유효한 시간을 선택해 주세요.'
   const period = hours >= 12 ? '오후' : '오전'
   const normalizedHour = hours % 12 === 0 ? 12 : hours % 12
   const paddedMinutes = minuteToken?.padStart(2, '0') ?? '00'
