@@ -97,32 +97,63 @@
               <path
                 class="map-trail"
                 d="
-                  M 165 440
-                  C 210 400 225 350 280 310
-                  C 330 275 340 230 380 210
-                  C 420 190 465 215 495 240
-                  C 530 268 565 260 600 230
-                  C 625 208 642 212 645 238
-                  C 650 280 610 320 575 345
-                  C 530 380 515 400 500 430
-                  C 475 480 410 490 350 480
-                  C 305 472 255 480 210 470
-                  C 190 465 175 456 165 440
+                  M 170 440
+                  C 212 402 232 352 288 320
+                  C 332 294 352 252 392 236
+                  C 432 220 468 236 500 256
+                  C 536 278 560 272 585 246
+                  C 600 230 602 236 598 258
+                  C 592 300 560 326 528 350
+                  C 492 376 472 398 456 424
+                  C 432 462 380 472 330 466
+                  C 284 461 240 466 206 456
+                  C 186 450 176 446 170 440
                 "
               />
 
               <path
-                class="map-trail map-trail--secondary"
+                class="map-water"
                 d="
-                  M 250 320
-                  C 300 320 320 360 360 360
-                  C 420 360 440 320 490 320
-                  C 530 320 560 350 560 380
+                  M 468 374
+                  C 482 354 514 350 540 360
+                  C 564 370 576 390 566 408
+                  C 552 432 518 440 488 430
+                  C 464 422 450 400 456 384
+                  C 460 376 462 378 468 374
+                  Z
+                "
+              />
+              <path
+                class="map-water-highlight"
+                d="
+                  M 482 380
+                  C 496 370 520 370 534 378
+                  C 542 382 546 392 536 398
+                  C 522 408 500 408 488 398
+                  C 480 392 476 386 482 380
+                  Z
                 "
               />
 
-              <ellipse class="map-water" cx="520" cy="220" rx="58" ry="34" />
-              <ellipse class="map-water" cx="265" cy="260" rx="32" ry="20" />
+              <g class="map-ornaments" aria-hidden="true">
+                <g class="map-pebbles map-pebbles--northwest">
+                  <ellipse class="map-pebble" cx="235" cy="235" rx="12" ry="8" />
+                  <ellipse class="map-pebble" cx="252" cy="225" rx="7" ry="5" />
+                  <ellipse class="map-pebble" cx="244" cy="250" rx="5" ry="4" />
+                </g>
+                <g class="map-pebbles map-pebbles--southwest">
+                  <ellipse class="map-pebble" cx="250" cy="420" rx="10" ry="7" />
+                  <ellipse class="map-pebble" cx="266" cy="408" rx="6" ry="4" />
+                  <ellipse class="map-pebble" cx="258" cy="428" rx="4" ry="3" />
+                </g>
+                <g class="map-house" transform="translate(560 300)">
+                  <rect x="-14" y="10" width="28" height="20" rx="4" />
+                  <path d="M -18 10 L 0 -4 L 18 10 Z" />
+                  <rect class="map-house__door" x="-4" y="18" width="8" height="12" rx="2" />
+                  <rect class="map-house__window" x="6" y="16" width="8" height="6" rx="1.5" />
+                </g>
+              </g>
+
 
               <g
                 class="menu-point menu-point--make"
@@ -134,8 +165,8 @@
                 @keydown.space.prevent="goCreate"
               >
                 <image
-                  :href="logoMake"
-                  :xlink:href="logoMake"
+                  :href="logoFind"
+                  :xlink:href="logoFind"
                   x="188"
                   y="278"
                   width="92"
@@ -153,10 +184,10 @@
                 @keydown.space.prevent="goSearch"
               >
                 <image
-                  :href="logoFind"
-                  :xlink:href="logoFind"
-                  x="431"
-                  y="216"
+                  :href="logoMake"
+                  :xlink:href="logoMake"
+                  x="415"
+                  y="148"
                   width="92"
                   height="92"
                   class="menu-logo"
@@ -186,11 +217,11 @@
         </div>
         <ul class="legend legend--menus">
           <li>
-            <img :src="logoMake" alt="방 만들기" class="legend-logo legend-logo--make" />
+            <img :src="logoFind" alt="방 만들기" class="legend-logo legend-logo--make" />
             <span>방 만들기</span>
           </li>
           <li>
-            <img :src="logoFind" alt="방 찾기" class="legend-logo legend-logo--find" />
+            <img :src="logoMake" alt="방 찾기" class="legend-logo legend-logo--find" />
             <span>방 찾기</span>
           </li>
           <li>
@@ -375,17 +406,41 @@ function goLatestNotice() {
   stroke-linejoin: round;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
 }
-.map-trail--secondary {
-  stroke: #ffe8a3;
-  stroke-width: 6;
-  stroke-dasharray: 14 12;
-  filter: none;
-}
 .map-water {
   fill: url(#map-water);
   stroke: #4fa1c7;
-  stroke-width: 4;
-  opacity: 0.9;
+  stroke-width: 3;
+  opacity: 1;
+}
+.map-water-highlight {
+  fill: rgba(255, 255, 255, 0.28);
+  stroke: none;
+  filter: blur(0.5px);
+}
+.map-ornaments {
+  fill: none;
+}
+.map-pebble {
+  fill: #d9cec0;
+  stroke: rgba(64, 49, 32, 0.35);
+  stroke-width: 2;
+}
+.map-house rect,
+.map-house path {
+  fill: #f5d2b0;
+  stroke: rgba(107, 74, 40, 0.7);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.map-house path {
+  fill: #d87733;
+}
+.map-house__door {
+  fill: #8a4a24;
+}
+.map-house__window {
+  fill: #fff7e6;
+  stroke: none;
 }
 .menu-point {
   cursor: pointer;
