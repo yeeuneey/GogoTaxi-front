@@ -27,12 +27,7 @@
       <p v-if="searchStatus" class="location-picker__status">{{ searchStatus }}</p>
       <div ref="mapEl" class="location-picker__map" />
       <p class="location-picker__coords">
-        <span class="location-picker__coords-label">
-          {{ selectedLabel || '지도를 움직여 위치를 선택해 주세요.' }}
-        </span>
-        <span class="location-picker__coords-meta">
-          위도 {{ selectedPosition.lat.toFixed(5) }}, 경도 {{ selectedPosition.lng.toFixed(5) }}
-        </span>
+        {{ selectedLabel || '지도를 움직여 위치를 선택해 주세요.' }}
       </p>
       <div class="location-picker__actions">
         <button type="button" class="picker-btn picker-btn--ghost" @click="$emit('cancel')">취소</button>
@@ -142,6 +137,7 @@ const selectedPosition = ref<GeoPoint>(props.initialPosition ?? { lat: 37.5665, 
 const searchQuery = ref('')
 const searchStatus = ref('')
 const searching = ref(false)
+const GENERIC_LABEL = '선택한 위치'
 const selectedLabel = ref('')
 const suggestions = ref<
   Array<{ id: string; name: string; address: string; lat: number; lng: number }>
@@ -172,7 +168,7 @@ function setMarkerPosition(position: GeoPoint, label?: string) {
 
 function updateLabelFromPosition(position: GeoPoint) {
   if (!geocoder || !kakaoApi) {
-    selectedLabel.value = `위도 ${position.lat.toFixed(5)}, 경도 ${position.lng.toFixed(5)}`
+    selectedLabel.value = GENERIC_LABEL
     return
   }
   geocoder.coord2Address(position.lng, position.lat, (result, status) => {
@@ -180,9 +176,9 @@ function updateLabelFromPosition(position: GeoPoint) {
       selectedLabel.value =
         result[0].road_address?.address_name ??
         result[0].address?.address_name ??
-        `위도 ${position.lat.toFixed(5)}, 경도 ${position.lng.toFixed(5)}`
+        GENERIC_LABEL
     } else {
-      selectedLabel.value = `위도 ${position.lat.toFixed(5)}, 경도 ${position.lng.toFixed(5)}`
+      selectedLabel.value = GENERIC_LABEL
     }
   })
 }
@@ -190,7 +186,7 @@ function updateLabelFromPosition(position: GeoPoint) {
 function confirmSelection() {
   emit('confirm', {
     position: { ...selectedPosition.value },
-    label: selectedLabel.value || `위도 ${selectedPosition.value.lat.toFixed(5)}, 경도 ${selectedPosition.value.lng.toFixed(5)}`,
+    label: selectedLabel.value || GENERIC_LABEL,
   })
 }
 
@@ -227,7 +223,7 @@ function searchAddress() {
     const label =
       first.road_address?.address_name ??
       first.address?.address_name ??
-      `위도 ${position.lat.toFixed(5)}, 경도 ${position.lng.toFixed(5)}`
+      GENERIC_LABEL
     searchStatus.value = `${label}로 이동했어요.`
     setMarkerPosition(position, label)
   })
@@ -480,21 +476,9 @@ onBeforeUnmount(() => {
 
 .location-picker__coords {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: center;
-}
-
-.location-picker__coords-label {
   font-size: 14px;
   font-weight: 600;
   color: #92400e;
-}
-
-.location-picker__coords-meta {
-  font-size: 12px;
-  color: #78350f;
 }
 
 .location-picker__actions {

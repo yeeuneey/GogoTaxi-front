@@ -420,8 +420,7 @@ function clearPreferredTime() {
 
 function formatLocationText(location: SelectedLocation | null) {
   if (!location) return '미설정'
-  const { position, label } = location
-  return label || `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
+  return location.label || '선택한 위치'
 }
 
 const pickerTitle = computed(() =>
