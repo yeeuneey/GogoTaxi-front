@@ -2,12 +2,7 @@
   <div id="app" class="app-shell">
     <AppHeader />
 
-    <main
-      class="app-content"
-      :style="hideBottomTab
-        ? { paddingBottom: '0', minHeight: 'calc(100dvh - var(--header-h))' }
-        : {}"
-    >
+    <main class="app-content" :style="contentStyle">
       <router-view />
     </main>
 
@@ -51,6 +46,27 @@ onBeforeUnmount(() => {
   window.visualViewport.removeEventListener('resize', handleViewportChange)
   window.visualViewport.removeEventListener('scroll', handleViewportChange)
 })
+
+const lockContentScroll = computed(() => Boolean(route.meta?.lockScroll))
+const flushBottomTab = computed(() => Boolean(route.meta?.flushBottomNav))
+
+const contentStyle = computed(() => {
+  const style: Record<string, string> = {}
+  if (hideBottomTab.value) {
+    const viewportHeight = 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))'
+    style.paddingBottom = '0'
+    style.minHeight = viewportHeight
+    style.height = viewportHeight
+  } else if (flushBottomTab.value) {
+    style.paddingBottom = '0'
+  }
+  if (lockContentScroll.value) {
+    style.overflow = 'hidden'
+    style.overflowY = 'hidden'
+    style.WebkitOverflowScrolling = 'auto'
+  }
+  return style
+})
 </script>
 
 <style>
@@ -90,4 +106,3 @@ body {
   min-height: calc(100dvh - var(--header-h));
 }
 </style>
-

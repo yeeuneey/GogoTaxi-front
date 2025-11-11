@@ -16,7 +16,7 @@
             id="social-name"
             v-model.trim="name"
             type="text"
-            placeholder="이름을 입력해 주세요"
+            placeholder="이름을 입력해 주세요."
           />
         </div>
 
