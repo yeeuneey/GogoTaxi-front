@@ -199,8 +199,13 @@ function handleSortModeChange(event: Event) {
 .sort-modal__label select {
   border-radius: 14px;
   border: 1px solid rgba(249, 115, 22, 0.4);
-  padding: 10px 14px;
-  background: #fffdf4;
+  padding: 10px 38px 10px 14px;
+  background: #fffdf4
+    url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41.59L6 5.17l4.59-4.58L12 2l-6 6-6-6L1.41.59z' fill='%23b45309'/%3E%3C/svg%3E")
+    no-repeat right 16px center;
+  background-size: 12px 8px;
+  appearance: none;
+  -webkit-appearance: none;
   font-size: 15px;
   color: #7c2d12;
 }
