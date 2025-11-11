@@ -38,6 +38,7 @@ type KakaoLatLng = {
 }
 type KakaoMapInstance = {
   setCenter(latlng: KakaoLatLng): void
+  getCenter(): KakaoLatLng
 }
 type KakaoMarkerInstance = {
   setPosition(latlng: KakaoLatLng): void
@@ -109,6 +110,7 @@ let kakaoApi: KakaoNamespace | null = null
 let map: KakaoMapInstance | null = null
 let marker: KakaoMarkerInstance | null = null
 let clickHandler: ((event: KakaoMouseClickEvent) => void) | null = null
+let dragEndHandler: (() => void) | null = null
 let geocoder: KakaoGeocoder | null = null
 
 function setMarkerPosition(position: GeoPoint) {
@@ -185,6 +187,16 @@ async function initMap() {
     selectedPosition.value = { lat: position.getLat(), lng: position.getLng() }
   })
 
+  const updateFromMapCenter = () => {
+    if (!map || !marker) return
+    const currentCenter = map.getCenter()
+    marker.setPosition(currentCenter)
+    selectedPosition.value = { lat: currentCenter.getLat(), lng: currentCenter.getLng() }
+  }
+
+  dragEndHandler = updateFromMapCenter
+  kakaoApi.maps.event.addListener(map, 'dragend', updateFromMapCenter)
+
   const clickFn = (mouseEvent: KakaoMouseClickEvent) => {
     const latlng = mouseEvent.latLng
     marker?.setPosition(latlng)
@@ -214,6 +226,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (kakaoApi && map && clickHandler) {
     kakaoApi.maps.event.removeListener(map, 'click', clickHandler)
+  }
+  if (kakaoApi && map && dragEndHandler) {
+    kakaoApi.maps.event.removeListener(map, 'dragend', dragEndHandler)
   }
   map = null
   kakaoApi = null
