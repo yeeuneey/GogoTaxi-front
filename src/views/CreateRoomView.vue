@@ -580,6 +580,7 @@ async function setupMapPicker() {
     const position = mapPickerMarker.getPosition()
     mapPickerPosition.lat = position.getLat()
     mapPickerPosition.lng = position.getLng()
+    mapPickerMap?.setCenter(position)
   })
 
   kakaoApi.maps.event.addListener(mapPickerMap, 'dragend', () => {
@@ -593,6 +594,7 @@ async function setupMapPicker() {
   kakaoApi.maps.event.addListener(mapPickerMap, 'click', (event: kakao.maps.event.MouseEvent) => {
     if (!mapPickerMarker) return
     mapPickerMarker.setPosition(event.latLng)
+    mapPickerMap?.setCenter(event.latLng)
     mapPickerPosition.lat = event.latLng.getLat()
     mapPickerPosition.lng = event.latLng.getLng()
   })

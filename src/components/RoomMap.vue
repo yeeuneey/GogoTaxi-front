@@ -32,6 +32,7 @@ let kakaoApi: KakaoNamespace | null = null
 let map: kakao.maps.Map | null = null
 const listMarkers: kakao.maps.Marker[] = []
 const selectedMarkers: kakao.maps.Marker[] = []
+let resizeObserver: ResizeObserver | null = null
 
 const hasSelection = computed(() => Boolean(props.selectedRoom))
 
@@ -105,9 +106,27 @@ function initializeMap(kakao: KakaoNamespace) {
     center: new kakao.maps.LatLng(37.5665, 126.978),
     level: 5,
   })
+  if ('ResizeObserver' in window) {
+    resizeObserver = new ResizeObserver(() => {
+      if (!map) return
+      const center = map.getCenter()
+      map.relayout()
+      map.setCenter(center)
+    })
+    resizeObserver.observe(canvas.value)
+  } else {
+    window.addEventListener('resize', handleWindowResize)
+  }
   ready.value = true
   errorMessage.value = null
   updateMarkers()
+}
+
+function handleWindowResize() {
+  if (!map) return
+  const center = map.getCenter()
+  map.relayout()
+  map.setCenter(center)
 }
 
 onMounted(async () => {
@@ -139,6 +158,8 @@ watch(
 onBeforeUnmount(() => {
   clearMarkers(listMarkers)
   clearMarkers(selectedMarkers)
+  resizeObserver?.disconnect()
+  window.removeEventListener('resize', handleWindowResize)
   map = null
   kakaoApi = null
 })

@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <section ref="viewRef" class="find-room">
-    <div class="map-area">
+    <div class="map-area" :style="mapAreaStyle">
       <RoomMap :rooms="sortedRooms" :selected-room="selectedRoom" />
     </div>
 
@@ -40,7 +40,7 @@
             type="button"
             class="sheet__toggle sheet__toggle--sort"
             :class="{ 'sheet__toggle--active': showSortOptions }"
-            @click.stop="toggleSortOptions"
+            @click.stop="toggleSortModal"
           >
             정렬
           </button>
@@ -50,85 +50,27 @@
         </div>
       </header>
 
-      <transition name="sort-panel">
-        <section v-if="showSortOptions" class="sort-panel" @click.stop>
-          <div class="sort-toolbar">
-            <div class="sort-toolbar__mode">
-              <label>
-                <span>정렬 기준</span>
-                <select v-model="sortMode">
-                  <option v-for="mode in sortModes" :key="mode.value" :value="mode.value">
-                    {{ mode.label }}
-                  </option>
-                </select>
-              </label>
-            </div>
-            <div class="sort-toolbar__inputs">
-              <button type="button" class="loc-btn" @click="useCurrentLocation" :disabled="isLocating">
-                {{ isLocating ? '위치 확인 중...' : userLocation ? '내 위치 업데이트' : '내 위치 불러오기' }}
-              </button>
-              <div class="location-set">
-                <div class="location-set__row">
-                  <div class="location-set__info">
-                    <p class="location-set__label">희망 출발지</p>
-                    <p class="location-set__value">{{ formatLocationText(desiredDeparture) }}</p>
-                  </div>
-                  <div class="location-set__actions">
-                    <button type="button" class="loc-mini" @click="openPicker('departure')">
-                      지도에서 선택
-                    </button>
-                    <button
-                      v-if="desiredDeparture"
-                      type="button"
-                      class="loc-clear"
-                      @click="clearDesired('departure')"
-                    >
-                      초기화
-                    </button>
-                  </div>
-                </div>
-                <div class="location-set__row">
-                  <div class="location-set__info">
-                    <p class="location-set__label">희망 도착지</p>
-                    <p class="location-set__value">{{ formatLocationText(desiredArrival) }}</p>
-                  </div>
-                  <div class="location-set__actions">
-                    <button type="button" class="loc-mini" @click="openPicker('arrival')">
-                      지도에서 선택
-                    </button>
-                    <button
-                      v-if="desiredArrival"
-                      type="button"
-                      class="loc-clear"
-                      @click="clearDesired('arrival')"
-                    >
-                      초기화
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="time-input">
-                <span>희망 출발 시간</span>
-                <div class="time-input__row">
-                  <button type="button" class="time-btn" @click="openTimePicker">
-                    {{ formattedPreferredTime }}
-                  </button>
-                  <button
-                    v-if="hasPreferredTime"
-                    type="button"
-                    class="loc-clear"
-                    @click="clearPreferredTime"
-                  >
-                    초기화
-                  </button>
-                </div>
-              </div>
-            </div>
-            <p v-if="sortHint" class="sort-toolbar__hint">{{ sortHint }}</p>
-          </div>
-        </section>
-      </transition>
-
+      <SortOptionsModal
+        v-if="showSortOptions"
+        :sort-mode="sortMode"
+        :sort-modes="sortModes"
+        :desired-departure-label="formatLocationText(desiredDeparture)"
+        :desired-arrival-label="formatLocationText(desiredArrival)"
+        :has-desired-departure="Boolean(desiredDeparture)"
+        :has-desired-arrival="Boolean(desiredArrival)"
+        :formatted-preferred-time="formattedPreferredTime"
+        :has-preferred-time="hasPreferredTime"
+        :is-locating="isLocating"
+        :has-user-location="Boolean(userLocation)"
+        :hint="sortHint"
+        @close="closeSortModal"
+        @select-sort-mode="value => (sortMode = value)"
+        @use-current-location="useCurrentLocation"
+        @open-picker="openPicker"
+        @clear-desired="clearDesired"
+        @open-time-picker="openTimePicker"
+        @clear-preferred-time="clearPreferredTime"
+      />
       <div
         ref="sheetListRef"
         class="sheet__list"
@@ -172,7 +114,7 @@
             >
               <header class="room-detail__header">
                 <h3>{{ room.title }}</h3>
-                <p class="room-detail__subtitle">{{ room.departure.label }} → {{ room.arrival.label }}</p>
+                <p class="room-detail__subtitle">{{ room.departure.label }} ??{{ room.arrival.label }}</p>
               </header>
               <dl class="room-detail__meta">
                 <div>
@@ -225,6 +167,7 @@ import { useRouter } from 'vue-router'
 import RoomMap from '@/components/RoomMap.vue'
 import LocationPicker from '@/components/LocationPicker.vue'
 import TimePicker from '@/components/TimePicker.vue'
+import SortOptionsModal from '@/components/SortOptionsModal.vue'
 import { mockRooms } from '@/data/mockRooms'
 import type { RoomPreview, GeoPoint } from '@/types/rooms'
 
@@ -237,6 +180,7 @@ const SNAP_THRESHOLD = 6
 const router = useRouter()
 const rooms = ref<RoomPreview[]>([...mockRooms])
 type SortMode = 'default' | 'nearest-departure' | 'nearest-arrival' | 'departure-time'
+type SelectedLocation = { position: GeoPoint; label: string }
 const sortMode = ref<SortMode>('default')
 const sortModes = [
   { value: 'default', label: '기본' },
@@ -246,8 +190,8 @@ const sortModes = [
 ] as const
 
 const userLocation = ref<GeoPoint | null>(null)
-const desiredDeparture = ref<GeoPoint | null>(null)
-const desiredArrival = ref<GeoPoint | null>(null)
+const desiredDeparture = ref<SelectedLocation | null>(null)
+const desiredArrival = ref<SelectedLocation | null>(null)
 const isLocating = ref(false)
 const locationError = ref<string | null>(null)
 const showSortOptions = ref(false)
@@ -326,7 +270,7 @@ const sortedRooms = computed(() => {
   switch (sortMode.value) {
     case 'nearest-departure':
       {
-        const anchor = desiredDeparture.value ?? userLocation.value
+        const anchor = desiredDeparture.value?.position ?? userLocation.value
         if (!anchor) return base
         return base.sort(
           (a, b) =>
@@ -336,10 +280,11 @@ const sortedRooms = computed(() => {
       }
     case 'nearest-arrival':
       if (!desiredArrival.value) return base
+      const anchor = desiredArrival.value.position
       return base.sort(
         (a, b) =>
-          distanceBetween(desiredArrival.value as GeoPoint, a.arrival.position) -
-          distanceBetween(desiredArrival.value as GeoPoint, b.arrival.position),
+          distanceBetween(anchor, a.arrival.position) -
+          distanceBetween(anchor, b.arrival.position),
       )
     case 'departure-time':
       {
@@ -353,7 +298,7 @@ const sortedRooms = computed(() => {
             Math.abs(aDate.getTime() - preferred.getTime()) -
             Math.abs(bDate.getTime() - preferred.getTime())
           if (timeDiff !== 0) return timeDiff
-          const location = desiredDeparture.value ?? userLocation.value
+          const location = desiredDeparture.value?.position ?? userLocation.value
           if (!location) return timeDiff
           return (
             distanceBetween(location, a.departure.position) -
@@ -382,8 +327,12 @@ const sortHint = computed(() => {
   return ''
 })
 
-function toggleSortOptions() {
+function toggleSortModal() {
   showSortOptions.value = !showSortOptions.value
+}
+
+function closeSortModal() {
+  showSortOptions.value = false
 }
 
 function openPicker(mode: 'departure' | 'arrival') {
@@ -394,11 +343,11 @@ function closePicker() {
   pickerMode.value = null
 }
 
-function handlePickerConfirm(position: GeoPoint) {
+function handlePickerConfirm(selection: SelectedLocation) {
   if (pickerMode.value === 'departure') {
-    desiredDeparture.value = position
+    desiredDeparture.value = selection
   } else if (pickerMode.value === 'arrival') {
-    desiredArrival.value = position
+    desiredArrival.value = selection
   }
   closePicker()
 }
@@ -416,9 +365,9 @@ function clearPreferredTime() {
   preferredMinute.value = ''
 }
 
-function formatLocationText(point: GeoPoint | null) {
-  if (!point) return '미설정'
-  return `${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}`
+function formatLocationText(location: SelectedLocation | null) {
+  if (!location) return '미설정'
+  return location.label || '선택한 위치'
 }
 
 const pickerTitle = computed(() =>
@@ -432,9 +381,14 @@ const pickerInitialPosition = computed<GeoPoint>(() => {
       lng: 126.978,
     }
   if (pickerMode.value === 'arrival') {
-    return desiredArrival.value ?? rooms.value[0]?.arrival.position ?? fallback
+    return desiredArrival.value?.position ?? rooms.value[0]?.arrival.position ?? fallback
   }
-  return desiredDeparture.value ?? userLocation.value ?? fallback
+  return (
+    desiredDeparture.value?.position ??
+    desiredArrival.value?.position ??
+    userLocation.value ??
+    fallback
+  )
 })
 
 const formattedPreferredTime = computed(() => {
@@ -477,6 +431,30 @@ const sheetStyle = computed(() =>
       : { height: 'auto' }
     : { height: `${(sheetHeight.value / 100) * baseHeight.value}px` },
 )
+const sheetPixelHeight = computed(() => {
+  if (isCollapsed.value) {
+    if (collapsedSheetHeight.value) {
+      return Math.min(collapsedSheetHeight.value, baseHeight.value)
+    }
+    const headerHeight = sheetHeaderRef.value?.getBoundingClientRect().height ?? 0
+    const listHeight = sheetListRef.value?.getBoundingClientRect().height ?? 0
+    const measured = headerHeight + listHeight
+    if (measured) {
+      return Math.min(measured, baseHeight.value)
+    }
+    return (COLLAPSED_SHEET / 100) * baseHeight.value
+  }
+  return (sheetHeight.value / 100) * baseHeight.value
+})
+const mapAreaStyle = computed(() => {
+  const sheetPx = Math.min(sheetPixelHeight.value, baseHeight.value)
+  return {
+    top: '0px',
+    left: '0px',
+    right: '0px',
+    bottom: `${sheetPx}px`,
+  }
+})
 
 let startY = 0
 let startHeight = MID_SHEET
@@ -665,8 +643,12 @@ onBeforeUnmount(() => {
 
 .map-area {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
   z-index: 0;
+  transition: bottom 0.3s ease;
 }
 
 .sheet {
@@ -725,24 +707,6 @@ onBeforeUnmount(() => {
   font-size: clamp(16px, 3.4vw, 20px);
 }
 
-.sort-panel {
-  padding: 14px clamp(18px, 4vw, 28px) 18px;
-  background: rgba(255, 250, 230, 0.96);
-  border-top: 1px solid rgba(245, 158, 11, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.sort-panel-enter-active,
-.sort-panel-leave-active {
-  transition: all 0.2s ease;
-}
-
-.sort-panel-enter-from,
-.sort-panel-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
 .sort-toolbar {
   display: grid;
   gap: 12px;
@@ -770,124 +734,6 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-}
-
-.location-set {
-  display: grid;
-  gap: 8px;
-  min-width: 220px;
-}
-
-.location-set__row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-}
-
-.location-set__info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.location-set__label {
-  margin: 0;
-  font-size: 11px;
-  color: #d97706;
-}
-
-.location-set__value {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #78350f;
-}
-
-.location-set__actions {
-  display: flex;
-  gap: 6px;
-}
-
-
-.loc-mini {
-  border: 1px solid rgba(217, 119, 6, 0.4);
-  background: rgba(253, 230, 138, 0.6);
-  color: #92400e;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.loc-mini:disabled {
-  opacity: 0.6;
-  cursor: progress;
-}
-
-.loc-clear {
-  border: none;
-  background: transparent;
-  color: #b45309;
-  font-size: 11px;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.loc-btn {
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  background: rgba(251, 191, 36, 0.18);
-  color: #b45309;
-  border-radius: 14px;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.loc-btn:disabled {
-  opacity: 0.6;
-  cursor: progress;
-}
-
-.sort-toolbar select,
-.time-input input {
-  border: 1px solid rgba(146, 64, 14, 0.2);
-  border-radius: 12px;
-  padding: 6px 12px;
-  font-size: 12px;
-  background: #fffef5;
-}
-
-.time-input {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 11px;
-  color: #92400e;
-}
-
-.time-input__row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.time-btn {
-  border: 1px solid rgba(251, 191, 36, 0.6);
-  background: rgba(253, 230, 138, 0.5);
-  color: #92400e;
-  border-radius: 14px;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.sort-toolbar__hint {
-  margin: 0;
-  font-size: 12px;
-  color: #b45309;
 }
 
 .sheet__header p {
@@ -1146,3 +992,6 @@ onBeforeUnmount(() => {
 }
 
 </style>
+
+
+
