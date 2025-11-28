@@ -47,7 +47,12 @@
             :aria-pressed="seat.number === selectedSeat"
             @click="selectSeat(seat.number)"
           >
-            <span>{{ seat.number }}</span>
+            <span class="seat-marker__content">
+              <span class="seat-marker__number">{{ seat.number }}</span>
+              <small v-if="seatGenderLabel(seat.number)" class="seat-marker__gender">
+                {{ seatGenderLabel(seat.number) }}
+              </small>
+            </span>
           </button>
         </div>
       </div>
@@ -79,11 +84,18 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRoomMembership } from '@/composables/useRoomMembership'
-import { joinRoomFromApi, changeSeatFromApi } from '@/api/rooms'
+import {
+  joinRoomFromApi,
+  changeSeatFromApi,
+  fetchRoomDetail,
+  type RoomParticipant,
+} from '@/api/rooms'
 import { getRoomById } from '@/data/mockRooms'
+import { useUserStore } from '@/stores/userStore'
+import { fetchMe } from '@/api/auth'
 
 interface SeatInfo {
   number: number
@@ -98,12 +110,53 @@ const seats: SeatInfo[] = [
   { number: 4, x: 72, y: 68 },
 ]
 
+const LABEL_MALE = '\uB0A8\uC131'
+const LABEL_FEMALE = '\uC5EC\uC131'
+const MALE_TOKENS = ['m', 'male', 'man', 'boy', '\uB0A8', '\uB0A8\uC131']
+const FEMALE_TOKENS = ['f', 'female', 'woman', 'girl', '\uC5EC', '\uC5EC\uC131']
+
 const router = useRouter()
 const route = useRoute()
 const selectedSeat = ref<number | null>(null)
+const participants = ref<RoomParticipant[]>([])
 const { joinedRooms, joinRoom: ensureRoom, updateSeat } = useRoomMembership()
+const userStore = useUserStore()
 const originalOverflow = ref('')
 const isJoining = ref(false)
+
+const roomId = computed(() => {
+  const raw = route.query.roomId
+  if (Array.isArray(raw)) {
+    const first = raw.find(token => typeof token === 'string' && token.trim())
+    return typeof first === 'string' && first.trim() ? first : 'room-101'
+  }
+  if (typeof raw === 'string' && raw.trim()) return raw
+  return 'room-101'
+})
+
+watch(
+  () => roomId.value,
+  id => {
+    if (id) {
+      loadParticipants(id)
+    } else {
+      participants.value = []
+    }
+  },
+  { immediate: true },
+)
+
+const seatOccupants = computed(() => {
+  const map = new Map<number, RoomParticipant>()
+  participants.value.forEach(participant => {
+    if (typeof participant.seatNumber === 'number') {
+      map.set(participant.seatNumber, participant)
+    }
+  })
+  return map
+})
+
+const currentUserGenderLabel = computed(() => formatGender(userStore.gender))
 
 const preferredSeatNumber = extractSeatQueryParam(route.query.preferredSeat)
 if (
@@ -122,6 +175,17 @@ function seatStyle(seat: SeatInfo) {
 
 function selectSeat(seatNumber: number) {
   selectedSeat.value = seatNumber
+}
+
+function seatGenderLabel(seatNumber: number) {
+  const occupant = seatOccupants.value.get(seatNumber)
+  if (occupant?.gender) {
+    return formatGender(occupant.gender)
+  }
+  if (seatNumber === selectedSeat.value && currentUserGenderLabel.value) {
+    return currentUserGenderLabel.value
+  }
+  return ''
 }
 
 function extractSeatQueryParam(rawValue: unknown) {
@@ -145,23 +209,53 @@ function resolveJoinError(err: unknown) {
   return '방 참여에 실패했어요. 잠시 후 다시 시도해 주세요.'
 }
 
+async function loadParticipants(id: string) {
+  try {
+    const { participants: list } = await fetchRoomDetail(id)
+    participants.value = list
+  } catch (error) {
+    console.warn('Failed to load room participants', error)
+    participants.value = []
+  }
+}
+
+async function ensureUserGender() {
+  if (userStore.gender && formatGender(userStore.gender)) return
+  try {
+    const me = await fetchMe()
+    if (me?.gender) {
+      userStore.gender = me.gender as typeof userStore.gender
+    }
+  } catch (error) {
+    console.warn('Failed to load profile', error)
+  }
+}
+
+function formatGender(value?: string | null) {
+  if (!value) return ''
+  const normalized = value.toString().trim().toLowerCase()
+  if (MALE_TOKENS.includes(normalized)) return LABEL_MALE
+  if (FEMALE_TOKENS.includes(normalized)) return LABEL_FEMALE
+  return ''
+}
+
 async function confirmSeat() {
    if (!selectedSeat.value || isJoining.value) return
-   const roomId = (route.query.roomId as string) || 'room-101'
+   const roomIdValue = roomId.value
    const seatNumber = selectedSeat.value
    isJoining.value = true
 
    try {
      // ?? ?? ??? ???? ??
-     const alreadyJoined = joinedRooms.value.some(entry => entry.roomId === roomId)
+     const alreadyJoined = joinedRooms.value.some(entry => entry.roomId === roomIdValue)
 
      if (alreadyJoined) {
-       await changeSeatFromApi(roomId, seatNumber)
+       await changeSeatFromApi(roomIdValue, seatNumber)
      } else {
-       await joinRoomFromApi(roomId, seatNumber)
+       await joinRoomFromApi(roomIdValue, seatNumber)
 
-       if (!joinedRooms.value.some(entry => entry.roomId === roomId)) {
-         const snapshot = getRoomById(roomId)
+       if (!joinedRooms.value.some(entry => entry.roomId === roomIdValue)) {
+         const snapshot = getRoomById(roomIdValue)
          if (snapshot) {
            ensureRoom(snapshot)
          }
@@ -169,10 +263,10 @@ async function confirmSeat() {
      }
 
 
-     updateSeat(roomId, seatNumber)
+     updateSeat(roomIdValue, seatNumber)
      router.push({
        name: 'room-detail',
-       params: { id: roomId },
+       params: { id: roomIdValue },
        query: { seat: seatNumber },
      })
    } catch (error) {
@@ -189,6 +283,7 @@ function goBack() {
 onMounted(() => {
   originalOverflow.value = document.body.style.overflow
   document.body.style.overflow = 'hidden'
+  ensureUserGender()
 })
 
 onBeforeUnmount(() => {
@@ -293,6 +388,21 @@ onBeforeUnmount(() => {
 }
 .seat-marker span {
   pointer-events: none;
+}
+.seat-marker__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.seat-marker__number {
+  font-size: 16px;
+}
+.seat-marker__gender {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(124, 45, 18, 0.9);
 }
 .seat-card__selection,
 .seat-card__selection--hint {

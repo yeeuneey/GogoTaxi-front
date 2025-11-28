@@ -119,6 +119,7 @@ export type RoomParticipant = {
   status?: string
   joinedAt?: string
   email?: string
+  gender?: string | null
 }
 
 export async function fetchRoomDetail(roomId: string): Promise<{
@@ -391,6 +392,13 @@ function normalizeParticipant(rawInput: RawRoom, index: number): RoomParticipant
   const status = pickString([rawInput.status, rawInput.state])
   const joinedAt = pickDateString([rawInput.joinedAt, rawInput.createdAt, rawInput.updatedAt])
   const email = pickString([rawInput.email, user?.email, rawInput.userEmail, profile?.email])
+  const gender = pickString([
+    rawInput.gender,
+    rawInput.sex,
+    rawInput.userGender,
+    (user as RawRoom | undefined)?.gender as string | undefined,
+    (profile as RawRoom | undefined)?.gender as string | undefined,
+  ])
 
   return {
     id,
@@ -400,6 +408,7 @@ function normalizeParticipant(rawInput: RawRoom, index: number): RoomParticipant
     status,
     joinedAt: joinedAt ?? undefined,
     email: email ?? undefined,
+    gender: gender ?? undefined,
   }
 }
 

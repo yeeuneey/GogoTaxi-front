@@ -46,7 +46,12 @@
             :aria-pressed="seat.number === selectedSeat"
             @click="selectSeat(seat.number)"
           >
-            <span>{{ seat.number }}</span>
+            <span class="seat-marker__content">
+              <span class="seat-marker__number">{{ seat.number }}</span>
+              <small v-if="seatGenderLabel(seat.number)" class="seat-marker__gender">
+                {{ seatGenderLabel(seat.number) }}
+              </small>
+            </span>
           </button>
         </div>
       </div>
@@ -83,8 +88,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { changeSeatFromApi } from '@/api/rooms'
+import { changeSeatFromApi, fetchRoomDetail, type RoomParticipant } from '@/api/rooms'
 import { useRoomMembership } from '@/composables/useRoomMembership'
+import { useUserStore } from '@/stores/userStore'
+import { fetchMe } from '@/api/auth'
 
 interface SeatInfo {
   number: number
@@ -99,13 +106,20 @@ const seats: SeatInfo[] = [
   { number: 4, x: 72, y: 68 },
 ]
 
+const LABEL_MALE = '\uB0A8\uC131'
+const LABEL_FEMALE = '\uC5EC\uC131'
+const MALE_TOKENS = ['m', 'male', 'man', 'boy', '\uB0A8', '\uB0A8\uC131']
+const FEMALE_TOKENS = ['f', 'female', 'woman', 'girl', '\uC5EC', '\uC5EC\uC131']
+
 const router = useRouter()
 const route = useRoute()
 const { joinedRooms, updateSeat } = useRoomMembership()
+const userStore = useUserStore()
 
 const selectedSeat = ref<number | null>(null)
 const originalOverflow = ref('')
 const isSaving = ref(false)
+const participants = ref<RoomParticipant[]>([])
 
 const roomIdFromQuery = computed(() => {
   const raw = route.query.roomId
@@ -127,10 +141,34 @@ const membership = computed(() => {
 const resolvedRoomId = computed(() => roomIdFromQuery.value ?? membership.value?.roomId ?? null)
 const isContextReady = computed(() => Boolean(resolvedRoomId.value && membership.value))
 
+const seatOccupants = computed(() => {
+  const map = new Map<number, RoomParticipant>()
+  participants.value.forEach(participant => {
+    if (typeof participant.seatNumber === 'number') {
+      map.set(participant.seatNumber, participant)
+    }
+  })
+  return map
+})
+
+const currentUserGenderLabel = computed(() => formatGender(userStore.gender))
+
 watch(
   () => membership.value?.seatNumber,
   seatNumber => {
     selectedSeat.value = typeof seatNumber === 'number' ? seatNumber : null
+  },
+  { immediate: true },
+)
+
+watch(
+  () => resolvedRoomId.value,
+  id => {
+    if (id) {
+      loadParticipants(id)
+    } else {
+      participants.value = []
+    }
   },
   { immediate: true },
 )
@@ -146,6 +184,17 @@ function selectSeat(seatNumber: number) {
   selectedSeat.value = seatNumber
 }
 
+function seatGenderLabel(seatNumber: number) {
+  const occupant = seatOccupants.value.get(seatNumber)
+  if (occupant?.gender) {
+    return formatGender(occupant.gender)
+  }
+  if (seatNumber === selectedSeat.value && currentUserGenderLabel.value) {
+    return currentUserGenderLabel.value
+  }
+  return ''
+}
+
 function resolveSeatError(err: unknown) {
   if (err instanceof Error && err.message) {
     return err.message
@@ -153,14 +202,44 @@ function resolveSeatError(err: unknown) {
   if (typeof err === 'string' && err.trim()) {
     return err
   }
-  return '좌석 변경에 실패했어요. 잠시 후 다시 시도해 주세요.'
+  return '?? ??? ?????. ?? ? ?? ??? ???.'
+}
+
+async function loadParticipants(id: string) {
+  try {
+    const { participants: list } = await fetchRoomDetail(id)
+    participants.value = list
+  } catch (error) {
+    console.warn('Failed to load room participants', error)
+    participants.value = []
+  }
+}
+
+async function ensureUserGender() {
+  if (userStore.gender && formatGender(userStore.gender)) return
+  try {
+    const me = await fetchMe()
+    if (me?.gender) {
+      userStore.gender = me.gender as typeof userStore.gender
+    }
+  } catch (error) {
+    console.warn('Failed to load profile', error)
+  }
+}
+
+function formatGender(value?: string | null) {
+  if (!value) return ''
+  const normalized = value.toString().trim().toLowerCase()
+  if (MALE_TOKENS.includes(normalized)) return LABEL_MALE
+  if (FEMALE_TOKENS.includes(normalized)) return LABEL_FEMALE
+  return ''
 }
 
 async function confirmSeat() {
   if (!selectedSeat.value || isSaving.value || !isContextReady.value) return
   const roomId = resolvedRoomId.value
   if (!roomId) {
-    alert('방 정보를 찾지 못했어요. 다시 시도해 주세요.')
+    alert('? ??? ?? ????. ?? ??? ???.')
     goBack()
     return
   }
@@ -194,7 +273,7 @@ function goBack() {
 
 function ensureRoomContext() {
   if (!resolvedRoomId.value || !membership.value) {
-    alert('좌석을 다시 선택할 방 정보를 찾지 못했어요.')
+    alert('??? ?? ??? ? ??? ?? ????.')
     router.push({ name: 'my-rooms' })
   }
 }
@@ -203,12 +282,18 @@ onMounted(() => {
   originalOverflow.value = document.body.style.overflow
   document.body.style.overflow = 'hidden'
   ensureRoomContext()
+  const id = resolvedRoomId.value
+  if (id) {
+    loadParticipants(id)
+  }
+  ensureUserGender()
 })
 
 onBeforeUnmount(() => {
   document.body.style.overflow = originalOverflow.value
 })
 </script>
+
 
 <style scoped>
 .seat-select {
@@ -307,6 +392,22 @@ onBeforeUnmount(() => {
 }
 .seat-marker span {
   pointer-events: none;
+}
+.seat-marker__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  line-height: 1.1;
+}
+.seat-marker__number {
+  font-size: 16px;
+}
+.seat-marker__gender {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(124, 45, 18, 0.9);
 }
 .seat-card__selection,
 .seat-card__selection--hint {
