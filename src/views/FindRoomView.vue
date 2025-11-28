@@ -181,7 +181,6 @@ import TimePicker from '@/components/TimePicker.vue'
 import SortOptionsModal from '@/components/SortOptionsModal.vue'
 import { fetchAvailableRooms } from '@/api/rooms'
 import type { RoomPreview, GeoPoint } from '@/types/rooms'
-import { useRoomMembership } from '@/composables/useRoomMembership'
 
 const COLLAPSED_SHEET = 22
 const MID_SHEET = 60
@@ -190,7 +189,6 @@ const SHEET_STATES = [COLLAPSED_SHEET, MID_SHEET, MAX_SHEET] as const
 const SNAP_THRESHOLD = 6
 
 const router = useRouter()
-const { joinRoom: rememberRoom } = useRoomMembership()
 const rooms = ref<RoomPreview[]>([])
 const selectedRoom = ref<RoomPreview | null>(null)
 const isLoadingRooms = ref(false)
@@ -659,7 +657,6 @@ function selectRoom(room: RoomPreview) {
 }
 
 function joinRoom(room: RoomPreview) {
-  rememberRoom(room)
   router.push({ name: 'seat-selection', query: { roomId: room.id } })
 }
 

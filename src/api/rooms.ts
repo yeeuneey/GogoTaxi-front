@@ -82,6 +82,7 @@ export type CreateRoomPayload = {
   fare?: number
   estimatedFare?: number
   estimatedDistanceKm?: number
+  hostSeatNumber?: number
 }
 
 export async function fetchAvailableRooms(params: FetchRoomsParams = {}): Promise<RoomPreview[]> {
@@ -158,6 +159,7 @@ export async function leaveRoomFromApi(roomId: string) {
 
 
 export async function joinRoomFromApi(roomId: string, seatNumber?: number | null) {
+
   if (!roomId) {
     throw new Error('�? ID가 ?�요?�요..')
   }
@@ -176,6 +178,24 @@ export async function joinRoomFromApi(roomId: string, seatNumber?: number | null
       return
     }
     await apiClient.post(url, payload)
+  } catch (error) {
+    throw formatError(error)
+  }
+}
+
+export async function changeSeatFromApi(roomId: string, seatNumber: number) {
+  if (!roomId) {
+    throw new Error('방 ID가 필요해요.')
+  }
+  if (typeof seatNumber !== 'number') {
+    throw new Error('좌석 번호가 필요해요.')
+  }
+
+  // 좌석 변경용 엔드포인트 (백엔드에서 PATCH /api/rooms/:id/seat 기준)
+  const url = `${ROOMS_ENDPOINT.replace(/\/$/, '')}/${roomId}/seat`
+
+  try {
+    await apiClient.patch(url, { seatNumber })
   } catch (error) {
     throw formatError(error)
   }

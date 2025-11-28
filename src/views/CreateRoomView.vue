@@ -163,6 +163,17 @@
           </label>
         </div>
 
+        <label class="field">
+          <span>내 좌석 번호</span>
+          <select v-model.number="form.hostSeatNumber">
+            <option :value="1">1번</option>
+            <option :value="2">2번</option>
+            <option :value="3">3번</option>
+            <option :value="4">4번</option>
+          </select>
+          <p class="hint">방장이 먼저 앉을 좌석을 선택해 주세요.</p>
+        </label>
+
         <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
 
         <footer class="actions">
@@ -195,6 +206,7 @@
       </div>
     </div>
 
+
     <TimePicker
       v-if="timePickerVisible"
       :period="timePickerPeriod === '오전' ? 'AM' : 'PM'"
@@ -217,6 +229,7 @@ import {
   createPaymentSections,
   type PaymentMethod as StoredPaymentMethod,
 } from '@/data/paymentMethods'
+import { useRoomMembership } from '@/composables/useRoomMembership'
 
 type Priority = 'time' | 'seats'
 type FieldKind = 'departure' | 'arrival'
@@ -258,6 +271,7 @@ function isMinuteOption(value: string): value is MinuteOption {
   return (minuteOptions as readonly string[]).includes(value)
 }
 const router = useRouter()
+const { joinRoom: rememberRoom, updateSeat } = useRoomMembership()
 
 const availablePaymentMethods: StoredPaymentMethod[] = createPaymentSections().flatMap((section) =>
   section.items.map((item) => ({
@@ -279,6 +293,7 @@ const form = reactive({
   departureTime: getCurrentSeoulTime(),
   priority: 'time' as Priority,
   paymentMethod: '',
+  hostSeatNumber: 1 as number | null,
 })
 
 const selectPaymentMethod = (id: string) => {
@@ -677,6 +692,7 @@ function resetForm() {
   form.departureTime = getCurrentSeoulTime()
   setTimePickerState(form.departureTime)
   form.priority = 'time'
+  form.hostSeatNumber = 1
   departureQuery.value = ''
   arrivalQuery.value = ''
   estimatedFare.value = 0
@@ -754,51 +770,113 @@ function buildCreateRoomPayload(): CreateRoomPayload {
     fare: estimatedFare.value || undefined,
     estimatedFare: estimatedFare.value || undefined,
     estimatedDistanceKm: estimatedDistanceKm.value || undefined,
+    hostSeatNumber: form.hostSeatNumber ?? undefined,
   }
 }
 
-async function submitForm() {
-  errorMessage.value = ''
-  successMessage.value = ''
-
-  if (!isValid.value) {
-    errorMessage.value = '?? ??? ?? ???? ??/??? ??? ???.'
-    return
-  }
-
-  if (isSubmitting.value) return
-
-  let payload: CreateRoomPayload
-  try {
-    payload = buildCreateRoomPayload()
-  } catch (buildError) {
-    errorMessage.value =
-      buildError instanceof Error && buildError.message
-        ? buildError.message
-        : '???? ???? ??? ???.'
-    return
-  }
-
-  try {
-    isSubmitting.value = true
-    const createdRoom = await createRoom(payload)
-    successMessage.value = '?? ??????! ? ????.'
-    setTimeout(() => {
-      if (createdRoom?.id) {
-        router.push({ name: 'room-detail', params: { id: createdRoom.id } })
-      } else {
-        router.push({ name: 'find-room' })
-      }
-      resetForm()
-    }, 500)
-  } catch (error) {
-    errorMessage.value =
-      error instanceof Error && error.message
-        ? error.message
-        : '?? ??? ????. ?? ? ?? ??? ???.'
-  } finally {
-    isSubmitting.value = false
-  }
+async function submitForm() {
+
+  errorMessage.value = ''
+
+  successMessage.value = ''
+
+
+
+  if (!isValid.value) {
+
+    errorMessage.value = '?? ??? ?? ???? ??/??? ??? ???.'
+
+    return
+
+  }
+
+
+
+  if (isSubmitting.value) return
+
+
+
+  let payload: CreateRoomPayload
+
+  try {
+
+    payload = buildCreateRoomPayload()
+
+  } catch (buildError) {
+
+    errorMessage.value =
+
+      buildError instanceof Error && buildError.message
+
+        ? buildError.message
+
+        : '???? ???? ??? ???.'
+
+    return
+
+  }
+
+
+
+  try {
+
+    isSubmitting.value = true
+
+    const createdRoom = await createRoom(payload)
+
+    const createdRoomId = createdRoom?.id
+
+    const preferredSeatNumber = form.hostSeatNumber
+
+    successMessage.value = '?? ?????! ??? ??? ???.'
+
+    if (createdRoomId) {
+
+      rememberRoom(createdRoom)
+
+      if (
+        typeof preferredSeatNumber === 'number' &&
+        preferredSeatNumber >= 1 &&
+        preferredSeatNumber <= 4
+      ) {
+        updateSeat(createdRoomId, preferredSeatNumber)
+      }
+
+      const detailQuery =
+        typeof preferredSeatNumber === 'number' ? { seat: preferredSeatNumber } : undefined
+
+      resetForm()
+
+      await router.push({
+        name: 'room-detail',
+        params: { id: createdRoomId },
+        query: detailQuery,
+      })
+
+    } else {
+
+      resetForm()
+
+      await router.push({ name: 'find-room' })
+
+    }
+
+  } catch (error) {
+
+    errorMessage.value =
+
+      error instanceof Error && error.message
+
+        ? error.message
+
+        : '?? ??? ????. ?? ? ?? ??? ???.'
+
+  } finally {
+
+    isSubmitting.value = false
+
+  }
+
 }
 
 </script>
