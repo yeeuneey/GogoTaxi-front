@@ -2,11 +2,10 @@
   <section class="seat-select">
     <div class="seat-card">
       <header class="seat-card__header">
-        <p class="seat-card__sub">배차 완료</p>
-        <h1>탑승 좌석 선택</h1>
+        <p class="seat-card__sub">좌석 재선택</p>
+        <h1>좌석 다시 선택</h1>
         <p class="seat-card__desc">
-          운전석은 기사님 좌석으로 이미 배정되어 있어요.<br>나머지 좌석 중에서 원하는 자리 한 곳을
-          선택하면 됩니다.
+          이미 참여 중인 방에서 좌석을 변경할 수 있어요.<br />원하는 좌석을 다시 선택해 주세요.
         </p>
       </header>
 
@@ -53,11 +52,14 @@
       </div>
 
       <transition name="fade">
-        <p v-if="selectedSeat" key="selection" class="seat-card__selection">
-          {{ selectedSeat }}번 좌석을 선택했어요. 아래 버튼으로 확정해 주세요.
+        <p v-if="!isContextReady" key="context-missing" class="seat-card__selection--hint">
+          방 정보를 확인할 수 없어요.<br />내 방 목록에서 다시 시도해 주세요.
+        </p>
+        <p v-else-if="selectedSeat" key="selection" class="seat-card__selection">
+          {{ selectedSeat }}번 좌석을 다시 선택했어요. 하단 버튼으로 확정해 주세요.
         </p>
         <p v-else key="selection-hint" class="seat-card__selection--hint">
-          선택 가능한 좌석은 총 네 자리입니다.<br>원하는 곳을 눌러 주세요.
+          변경할 좌석을 선택해 주세요.<br />선택 후 아래 버튼으로 확정할 수 있어요.
         </p>
       </transition>
 
@@ -68,10 +70,10 @@
         <button
           type="button"
           class="btn btn--primary"
-          :disabled="!selectedSeat || isJoining"
+          :disabled="!selectedSeat || isSaving || !isContextReady"
           @click="confirmSeat"
         >
-          {{ isJoining ? '참여 중...' : '좌석 확정하기' }}
+          {{ isSaving ? '좌석 변경 중...' : '좌석 다시 확정하기' }}
         </button>
       </footer>
     </div>
@@ -79,11 +81,10 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { changeSeatFromApi } from '@/api/rooms'
 import { useRoomMembership } from '@/composables/useRoomMembership'
-import { joinRoomFromApi, changeSeatFromApi } from '@/api/rooms'
-import { getRoomById } from '@/data/mockRooms'
 
 interface SeatInfo {
   number: number
@@ -100,18 +101,39 @@ const seats: SeatInfo[] = [
 
 const router = useRouter()
 const route = useRoute()
-const selectedSeat = ref<number | null>(null)
-const { joinedRooms, joinRoom: ensureRoom, updateSeat } = useRoomMembership()
-const originalOverflow = ref('')
-const isJoining = ref(false)
+const { joinedRooms, updateSeat } = useRoomMembership()
 
-const preferredSeatNumber = extractSeatQueryParam(route.query.preferredSeat)
-if (
-  typeof preferredSeatNumber === 'number' &&
-  seats.some(seat => seat.number === preferredSeatNumber)
-) {
-  selectedSeat.value = preferredSeatNumber
-}
+const selectedSeat = ref<number | null>(null)
+const originalOverflow = ref('')
+const isSaving = ref(false)
+
+const roomIdFromQuery = computed(() => {
+  const raw = route.query.roomId
+  if (Array.isArray(raw)) {
+    return raw[0] ?? null
+  }
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw
+  }
+  return null
+})
+
+const membership = computed(() => {
+  const roomId = roomIdFromQuery.value
+  if (!roomId) return null
+  return joinedRooms.value.find(entry => entry.roomId === roomId) ?? null
+})
+
+const resolvedRoomId = computed(() => roomIdFromQuery.value ?? membership.value?.roomId ?? null)
+const isContextReady = computed(() => Boolean(resolvedRoomId.value && membership.value))
+
+watch(
+  () => membership.value?.seatNumber,
+  seatNumber => {
+    selectedSeat.value = typeof seatNumber === 'number' ? seatNumber : null
+  },
+  { immediate: true },
+)
 
 function seatStyle(seat: SeatInfo) {
   return {
@@ -124,71 +146,63 @@ function selectSeat(seatNumber: number) {
   selectedSeat.value = seatNumber
 }
 
-function extractSeatQueryParam(rawValue: unknown) {
-  if (Array.isArray(rawValue)) {
-    rawValue = rawValue[0]
-  }
-  if (rawValue == null) {
-    return null
-  }
-  const parsed = typeof rawValue === 'string' ? Number(rawValue) : Number(rawValue)
-  return Number.isNaN(parsed) ? null : parsed
-}
-
-function resolveJoinError(err: unknown) {
+function resolveSeatError(err: unknown) {
   if (err instanceof Error && err.message) {
     return err.message
   }
   if (typeof err === 'string' && err.trim()) {
     return err
   }
-  return '방 참여에 실패했어요. 잠시 후 다시 시도해 주세요.'
+  return '좌석 변경에 실패했어요. 잠시 후 다시 시도해 주세요.'
 }
 
 async function confirmSeat() {
-   if (!selectedSeat.value || isJoining.value) return
-   const roomId = (route.query.roomId as string) || 'room-101'
-   const seatNumber = selectedSeat.value
-   isJoining.value = true
+  if (!selectedSeat.value || isSaving.value || !isContextReady.value) return
+  const roomId = resolvedRoomId.value
+  if (!roomId) {
+    alert('방 정보를 찾지 못했어요. 다시 시도해 주세요.')
+    goBack()
+    return
+  }
 
-   try {
-     // ?? ?? ??? ???? ??
-     const alreadyJoined = joinedRooms.value.some(entry => entry.roomId === roomId)
+  isSaving.value = true
+  const seatNumber = selectedSeat.value
 
-     if (alreadyJoined) {
-       await changeSeatFromApi(roomId, seatNumber)
-     } else {
-       await joinRoomFromApi(roomId, seatNumber)
-
-       if (!joinedRooms.value.some(entry => entry.roomId === roomId)) {
-         const snapshot = getRoomById(roomId)
-         if (snapshot) {
-           ensureRoom(snapshot)
-         }
-       }
-     }
-
-
-     updateSeat(roomId, seatNumber)
-     router.push({
-       name: 'room-detail',
-       params: { id: roomId },
-       query: { seat: seatNumber },
-     })
-   } catch (error) {
-     alert(resolveJoinError(error))
-   } finally {
-     isJoining.value = false
-   }
- }
+  try {
+    await changeSeatFromApi(roomId, seatNumber)
+    updateSeat(roomId, seatNumber)
+    router.push({
+      name: 'room-detail',
+      params: { id: roomId },
+      query: { seat: seatNumber },
+    })
+  } catch (error) {
+    alert(resolveSeatError(error))
+  } finally {
+    isSaving.value = false
+  }
+}
 
 function goBack() {
-  router.push({ name: 'find-room' })
+  const targetRoomId = resolvedRoomId.value ?? joinedRooms.value[0]?.roomId
+  if (targetRoomId) {
+    router.push({ name: 'room-detail', params: { id: targetRoomId } })
+  } else {
+    router.push({ name: 'my-rooms' })
+  }
+}
+
+function ensureRoomContext() {
+  if (!resolvedRoomId.value || !membership.value) {
+    alert('좌석을 다시 선택할 방 정보를 찾지 못했어요.')
+    router.push({ name: 'my-rooms' })
+  }
 }
 
 onMounted(() => {
   originalOverflow.value = document.body.style.overflow
   document.body.style.overflow = 'hidden'
+  ensureRoomContext()
 })
 
 onBeforeUnmount(() => {

@@ -101,6 +101,12 @@ const routes = [
     meta: { requiresAuth: true, lockScroll: true },
   },
   {
+    path: '/seat-reselection',
+    name: 'seat-reselection',
+    component: () => import('@/views/SeatReselectView.vue'),
+    meta: { requiresAuth: true, lockScroll: true },
+  },
+  {
     path: '/rooms/:id',
     name: 'room-detail',
     component: () => import('@/views/RoomDetailView.vue'),

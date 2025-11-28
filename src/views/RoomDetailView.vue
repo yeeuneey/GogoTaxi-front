@@ -243,7 +243,7 @@ async function loadRoomDetail(id: string) {
 }
 
 function changeSeat() {
-  router.push({ name: 'seat-selection', query: { roomId: roomId.value } })
+  router.push({ name: 'seat-reselection', query: { roomId: roomId.value } })
 }
 
 async function leaveRoom() {
