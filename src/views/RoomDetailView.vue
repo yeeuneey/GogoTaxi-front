@@ -66,56 +66,6 @@
         <p class="fare-summary__hint">참여 인원에 맞춰 n분의 1로 자동 계산돼요.</p>
       </article>
 
-      <article class="room-panel room-panel--status">
-        <h2>배차 진행 상황</h2>
-        <div class="status-current" :class="`status-current--${statusInfo.key}`">
-          <p class="status-current__label">{{ statusInfo.label }}</p>
-          <p class="status-current__desc">{{ statusInfo.description }}</p>
-          <button
-            v-if="room.status === 'failed'"
-            type="button"
-            class="status-current__retry"
-            @click="retryDispatch"
-          >
-            배차 다시 시도하기
-          </button>
-        </div>
-        <div class="room-panel__cta room-panel__cta--route">
-          <button type="button" class="link-btn" @click="toggleRouteMap">
-            {{ showRouteMap ? '지금 숨기기' : '경로 보기' }}
-          </button>
-        </div>
-        <transition name="route-map">
-          <div v-if="showRouteMap" class="route-map-wrapper">
-            <RouteMapBox :departure="room.departure" :arrival="room.arrival" :title="room.title" />
-          </div>
-        </transition>
-        <ol class="dispatch-timeline" aria-label="배차 진행 단계">
-          <li
-            v-for="step in dispatchTimeline"
-            :key="step.key"
-            class="dispatch-timeline__item"
-            :class="`dispatch-timeline__item--${step.state}`"
-          >
-            <div class="dispatch-timeline__badge">{{ step.title }}</div>
-            <div class="dispatch-timeline__body">
-              <p class="dispatch-timeline__title">{{ step.title }}</p>
-              <p class="dispatch-timeline__desc">{{ step.description }}</p>
-              <small v-if="step.hint" class="dispatch-timeline__hint">{{ step.hint }}</small>
-            </div>
-          </li>
-        </ol>
-
-        <div v-if="showTaxiInfo" class="taxi-card">
-          <p class="taxi-card__title">배차/운행 정보</p>
-          <p class="taxi-card__plate">{{ currentTaxi?.carModel }} · {{ currentTaxi?.carNumber }}</p>
-          <p class="taxi-card__driver">{{ currentTaxi?.driverName }}</p>
-        </div>
-        <p v-else-if="room.status === 'failed'" class="status-hint">
-          배차가 실패했어요. 인원 모집을 조정하거나 다시 시도해 주세요.
-        </p>
-      </article>
-
       <article v-if="isHost" class="room-panel room-panel--vision">
         <h2>배차 스크린샷 자동 공유</h2>
         <p class="vision-intro">
@@ -223,6 +173,8 @@ import {
 import { useRoomMembership } from '@/composables/useRoomMembership'
 import { connectRoomChannel, type RoomRealtimePatch } from '@/services/roomSocket'
 import { getCurrentUser } from '@/services/auth'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import RouteMapBox from '@/components/RouteMapBox.vue'
 import {
   analyzeDispatchScreenshot,
   fetchRideState,
@@ -582,6 +534,7 @@ async function openUber() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function retryDispatch() {
   if (!isHost.value) {
     realtimeError.value = '방장만 배차를 다시 시도할 수 있어요.'
@@ -1283,8 +1236,6 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-
-
 
 
 
