@@ -66,6 +66,127 @@
         <p class="fare-summary__hint">참여 인원에 맞춰 n분의 1로 자동 계산돼요.</p>
       </article>
 
+      <article class="room-panel room-panel--status">
+        <h2>배차 진행 상황</h2>
+        <div class="status-current" :class="`status-current--${statusInfo.key}`">
+          <p class="status-current__label">{{ statusInfo.label }}</p>
+          <p class="status-current__desc">{{ statusInfo.description }}</p>
+          <button
+            v-if="room.status === 'failed'"
+            type="button"
+            class="status-current__retry"
+            @click="retryDispatch"
+          >
+            배차 다시 시도하기
+          </button>
+        </div>
+        <div class="room-panel__cta room-panel__cta--route">
+          <button type="button" class="link-btn" @click="toggleRouteMap">
+            {{ showRouteMap ? '지금 숨기기' : '경로 보기' }}
+          </button>
+        </div>
+        <transition name="route-map">
+          <div v-if="showRouteMap" class="route-map-wrapper">
+            <RouteMapBox :departure="room.departure" :arrival="room.arrival" :title="room.title" />
+          </div>
+        </transition>
+        <ol class="dispatch-timeline" aria-label="배차 진행 단계">
+          <li
+            v-for="step in dispatchTimeline"
+            :key="step.key"
+            class="dispatch-timeline__item"
+            :class="`dispatch-timeline__item--${step.state}`"
+          >
+            <div class="dispatch-timeline__badge">{{ step.title }}</div>
+            <div class="dispatch-timeline__body">
+              <p class="dispatch-timeline__title">{{ step.title }}</p>
+              <p class="dispatch-timeline__desc">{{ step.description }}</p>
+              <small v-if="step.hint" class="dispatch-timeline__hint">{{ step.hint }}</small>
+            </div>
+          </li>
+        </ol>
+
+        <div v-if="showTaxiInfo" class="taxi-card">
+          <p class="taxi-card__title">배차/운행 정보</p>
+          <p class="taxi-card__plate">{{ currentTaxi?.carModel }} · {{ currentTaxi?.carNumber }}</p>
+          <p class="taxi-card__driver">{{ currentTaxi?.driverName }}</p>
+        </div>
+        <p v-else-if="room.status === 'failed'" class="status-hint">
+          배차가 실패했어요. 인원 모집을 조정하거나 다시 시도해 주세요.
+        </p>
+      </article>
+
+      <article v-if="isHost" class="room-panel room-panel--vision">
+        <h2>배차 스크린샷 자동 공유</h2>
+        <p class="vision-intro">
+          호출 앱에서 캡처한 화면을 올리면 기사님 이름·차량 번호·차종을 자동으로 채워 팀원에게 공유하고 예치금도 자동으로 잡아줘요.
+        </p>
+        <div
+          v-if="!dispatchUploadComplete"
+          class="vision-drop"
+          :class="{
+            'vision-drop--hover': dispatchUploadHover,
+            'vision-drop--busy': dispatchUploadBusy,
+          }"
+          @dragenter.prevent="onDispatchDragEnter"
+          @dragover.prevent="onDispatchDragEnter"
+          @dragleave.prevent="onDispatchDragLeave"
+          @drop.prevent="onDispatchDrop"
+        >
+          <input
+            ref="dispatchFileInput"
+            class="vision-drop__input"
+            type="file"
+            accept="image/*"
+            @change="onDispatchFileChange"
+          />
+          <p class="vision-drop__title">
+            {{ dispatchUploadBusy ? 'Gemini가 정보를 읽는 중...' : '여기에 스크린샷을 끌어놓거나 클릭해서 선택하세요' }}
+          </p>
+          <button
+            type="button"
+            class="vision-drop__button"
+            :disabled="dispatchUploadBusy"
+            @click="openDispatchFileDialog"
+          >
+            이미지 선택
+          </button>
+          <small class="vision-drop__hint">JPG / PNG / HEIC 등 대부분의 이미지 파일을 지원해요.</small>
+        </div>
+        <p v-if="dispatchUploadMessage" class="vision-status vision-status--success">
+          {{ dispatchUploadMessage }}
+        </p>
+        <p v-else-if="dispatchUploadError" class="vision-status vision-status--error">
+          {{ dispatchUploadError }}
+        </p>
+        <p v-if="dispatchHoldResult" class="vision-status vision-status--success">
+          {{ dispatchHoldResult.collectedFrom }}명의 참여자에게서 1인당
+          {{ formatFareLabel(dispatchHoldResult.perHead) }}씩 자동 예치금을 잡았어요.
+        </p>
+        <p v-else-if="dispatchHoldError" class="vision-status vision-status--error">
+          {{ dispatchHoldError }}
+        </p>
+        <div v-if="dispatchAnalysis?.summary || dispatchAnalysis?.rawText" class="vision-analysis">
+          <p v-if="dispatchAnalysis.summary" class="vision-analysis__summary">
+            {{ dispatchAnalysis.summary }}
+          </p>
+          <dl class="vision-analysis__meta">
+            <div>
+              <dt>기사님</dt>
+              <dd>{{ dispatchAnalysis.driverName ?? '인식 실패' }}</dd>
+            </div>
+            <div>
+              <dt>차량 번호</dt>
+              <dd>{{ dispatchAnalysis.carNumber ?? '인식 실패' }}</dd>
+            </div>
+            <div>
+              <dt>차종</dt>
+              <dd>{{ dispatchAnalysis.carModel ?? '인식 실패' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </article>
+
       <article class="room-panel room-panel--participants">
         <h2>참여자 현황</h2>
         <ul class="participant-list">
@@ -103,8 +224,11 @@ import { useRoomMembership } from '@/composables/useRoomMembership'
 import { connectRoomChannel, type RoomRealtimePatch } from '@/services/roomSocket'
 import { getCurrentUser } from '@/services/auth'
 import {
+  analyzeDispatchScreenshot,
   fetchRideState,
   requestRide,
+  updateRideStage,
+  type DispatchAnalysis,
   type RideStage,
   type RideState,
 } from '@/api/ride'
@@ -148,6 +272,15 @@ const filteredRideError = computed(() =>
 const rideRequesting = ref(false)
 const ridePolling = ref<ReturnType<typeof setInterval> | null>(null)
 const ridePollingBusy = ref(false)
+const dispatchAnalysis = ref<DispatchAnalysis | null>(null)
+const dispatchUploadComplete = computed(() => Boolean(dispatchAnalysis.value))
+const dispatchUploadBusy = ref(false)
+const dispatchUploadHover = ref(false)
+const dispatchUploadMessage = ref('')
+const dispatchUploadError = ref('')
+const dispatchHoldResult = ref<{ perHead: number; collectedFrom: number } | null>(null)
+const dispatchHoldError = ref('')
+const dispatchFileInput = ref<HTMLInputElement | null>(null)
 const currentUserId = computed(() => getCurrentUser()?.id ?? '')
 const hostParticipant = computed(() => {
   const labeledHost = participantsRaw.value.find(mate =>
@@ -233,6 +366,17 @@ watch(
     else stopRidePolling()
   },
   { immediate: true },
+)
+
+watch(
+  () => roomId.value,
+  () => {
+    dispatchAnalysis.value = null
+    dispatchUploadMessage.value = ''
+    dispatchUploadError.value = ''
+    dispatchHoldResult.value = null
+    dispatchHoldError.value = ''
+  },
 )
 
 async function loadRoomDetail(id: string) {
@@ -438,9 +582,107 @@ async function openUber() {
   }
 }
 
+async function retryDispatch() {
+  if (!isHost.value) {
+    realtimeError.value = '방장만 배차를 다시 시도할 수 있어요.'
+    return
+  }
+  await updateRideProgress('dispatching')
+}
 
+async function updateRideProgress(stage: RideStage) {
+  if (!roomId.value) return
+  try {
+    const next = await updateRideStage(roomId.value, { ...(rideState.value ?? { stage }), stage })
+    applyRideState(next)
+  } catch (error) {
+    realtimeError.value = resolveErrorMessage(error, '배차 상태 업데이트에 실패했어요.')
+  }
+}
 
+function openDispatchFileDialog() {
+  dispatchFileInput.value?.click()
+}
 
+async function onDispatchFileChange(event: Event) {
+  const input = event.target as HTMLInputElement | null
+  const file = input?.files?.[0]
+  if (!file) return
+  await handleDispatchFile(file)
+  if (input) input.value = ''
+}
+
+function onDispatchDragEnter(event: DragEvent) {
+  event.preventDefault()
+  dispatchUploadHover.value = true
+}
+
+function onDispatchDragLeave(event: DragEvent) {
+  if (event.currentTarget === event.target) {
+    dispatchUploadHover.value = false
+  }
+}
+
+async function onDispatchDrop(event: DragEvent) {
+  event.preventDefault()
+  dispatchUploadHover.value = false
+  const file = event.dataTransfer?.files?.[0]
+  if (file) {
+    await handleDispatchFile(file)
+  }
+}
+
+async function handleDispatchFile(file: File) {
+  if (!roomId.value) {
+    dispatchUploadError.value = '방 정보를 찾지 못했어요.'
+    return
+  }
+  dispatchUploadBusy.value = true
+  dispatchUploadMessage.value = ''
+  dispatchUploadError.value = ''
+  dispatchHoldResult.value = null
+  dispatchHoldError.value = ''
+  try {
+    const base64 = await readFileAsBase64(file)
+    const payload = {
+      imageBase64: sanitizeBase64(base64),
+      mimeType: file.type || 'image/png',
+    }
+    const result = await analyzeDispatchScreenshot(roomId.value, payload)
+    dispatchAnalysis.value = result.analysis
+    if (result.rideState) {
+      applyRideState(result.rideState)
+    } else {
+      await pollRideState(roomId.value, true)
+    }
+    if (result.settlementHold) {
+      dispatchHoldResult.value = result.settlementHold
+    }
+    if (result.settlementHoldError) {
+      dispatchHoldError.value = result.settlementHoldError.message
+    }
+    dispatchUploadMessage.value = '스크린샷을 분석했어요.'
+  } catch (error) {
+    dispatchUploadError.value = resolveErrorMessage(error, '이미지를 분석하지 못했어요.')
+  } finally {
+    dispatchUploadBusy.value = false
+  }
+}
+
+function readFileAsBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error ?? new Error('파일을 읽지 못했어요.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+function sanitizeBase64(data: string) {
+  if (!data) return data
+  const commaIndex = data.indexOf(',')
+  return commaIndex === -1 ? data : data.slice(commaIndex + 1)
+}
 
 function toInitials(source?: string, fallback = 'ME') {
   if (!source) return fallback
@@ -740,14 +982,218 @@ onBeforeUnmount(() => {
   color: #b45309;
 }
 
+.status-current {
+  border-radius: 20px;
+  padding: 18px;
+  background: rgba(253, 230, 138, 0.45);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+}
 
+.status-current__label {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #7c2d12;
+}
 
+.status-current__desc {
+  margin: 6px 0 0;
+  color: #a16207;
+}
 
+.status-current__retry {
+  margin-top: 12px;
+  align-self: flex-start;
+  background: #b91c1c;
+  color: #fffaf0;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
+.status-current__retry:hover {
+  transform: translateY(-1px);
+}
 
+.status-current--success {
+  background: rgba(187, 247, 208, 0.45);
+  border-color: rgba(16, 185, 129, 0.45);
+}
 
-.room-panel--participants {
+.status-current--failed {
+  background: rgba(254, 226, 226, 0.65);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.status-hint {
+  margin: 0;
+  font-size: 14px;
+  color: #b45309;
+}
+
+.taxi-card {
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: rgba(16, 185, 129, 0.08);
+  display: grid;
+  gap: 4px;
+}
+
+.taxi-card__title {
+  margin: 0;
+  font-size: 13px;
+  color: #0f766e;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.taxi-card__plate {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.taxi-card__driver {
+  margin: 0;
+  font-size: 13px;
+  color: #0f766e;
+}
+
+.room-panel--status,
+.room-panel--participants,
+.room-panel--vision {
   grid-column: span 2;
+}
+
+.room-panel--vision {
+  background: #fffdfa;
+  border: 2px dashed rgba(59, 47, 31, 0.08);
+}
+
+.vision-intro {
+  margin: 0 0 16px;
+  color: rgba(59, 47, 31, 0.76);
+  line-height: 1.5;
+}
+
+.vision-drop {
+  position: relative;
+  border: 2px dashed rgba(59, 47, 31, 0.3);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.vision-drop--hover {
+  border-color: #ff7a00;
+  background: rgba(255, 239, 214, 0.8);
+}
+
+.vision-drop--busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.vision-drop__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.vision-drop__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.vision-drop__button {
+  border: 1px solid rgba(59, 47, 31, 0.3);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.vision-drop__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vision-drop__button:not(:disabled):hover {
+  background: #3b2f1f;
+  color: #fff;
+}
+
+.vision-drop__hint {
+  display: block;
+  margin-top: 10px;
+  color: rgba(59, 47, 31, 0.6);
+}
+
+.vision-status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.vision-status--success {
+  background: rgba(34, 197, 94, 0.12);
+  color: #065f46;
+}
+
+.vision-status--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.vision-analysis {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(59, 47, 31, 0.08);
+}
+
+.vision-analysis__summary {
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.vision-analysis__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.vision-analysis__meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vision-analysis__meta dt {
+  font-size: 0.85rem;
+  color: rgba(59, 47, 31, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.vision-analysis__meta dd {
+  margin: 0;
+  font-weight: 600;
+  color: #3b2f1f;
 }
 
 .btn {
@@ -830,7 +1276,9 @@ onBeforeUnmount(() => {
 
 
 @media (max-width: 720px) {
-  .room-panel--participants {
+  .room-panel--status,
+  .room-panel--participants,
+  .room-panel--vision {
     grid-column: auto;
   }
 }
