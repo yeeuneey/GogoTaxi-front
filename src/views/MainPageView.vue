@@ -54,85 +54,30 @@
             <g class="map-illustration" transform="translate(-20 -85) scale(1.08)">
               <path
                 class="map-land"
-                d="
-                  M 120 470
-                  C 70 380 90 270 210 220
-                  C 260 200 250 150 320 120
-                  C 410 80 520 120 600 180
-                  C 705 260 720 340 670 400
-                  C 628 450 572 478 530 508
-                  C 470 550 390 538 315 540
-                  C 230 542 170 530 120 470
-                  Z
-                "
+                d=" M 120 470 C 70 380 90 270 210 220 C 260 200 250 150 320 120 C 410 80 520 120 600 180 C 705 260 720 340 670 400 C 628 450 572 478 530 508 C 470 550 390 538 315 540 C 230 542 170 530 120 470 Z "
               />
               <path
                 class="map-shadow"
-                d="
-                  M 150 500
-                  C 120 420 160 340 250 300
-                  C 310 270 310 220 360 200
-                  C 430 170 500 200 550 240
-                  C 620 295 640 350 610 395
-                  C 570 455 480 470 430 500
-                  C 360 540 250 540 180 520
-                  Z
-                "
+                d=" M 150 500 C 120 420 160 340 250 300 C 310 270 310 220 360 200 C 430 170 500 200 550 240 C 620 295 640 350 610 395 C 570 455 480 470 430 500 C 360 540 250 540 180 520 Z "
               />
 
               <path
                 class="map-border"
-                d="
-                  M 120 470
-                  C 70 380 90 270 210 220
-                  C 260 200 250 150 320 120
-                  C 410 80 520 120 600 180
-                  C 705 260 720 340 670 400
-                  C 628 450 572 478 530 508
-                  C 470 550 390 538 315 540
-                  C 230 542 170 530 120 470
-                "
+                d=" M 120 470 C 70 380 90 270 210 220 C 260 200 250 150 320 120 C 410 80 520 120 600 180 C 705 260 720 340 670 400 C 628 450 572 478 530 508 C 470 550 390 538 315 540 C 230 542 170 530 120 470 "
               />
 
               <path
                 class="map-trail"
-                d="
-                  M 170 440
-                  C 212 402 232 352 288 320
-                  C 332 294 352 252 392 236
-                  C 432 220 468 236 500 256
-                  C 536 278 560 272 585 246
-                  C 600 230 602 236 598 258
-                  C 592 300 560 326 528 350
-                  C 492 376 472 398 456 424
-                  C 432 462 380 472 330 466
-                  C 284 461 240 466 206 456
-                  C 186 450 176 446 170 440
-                "
+                d=" M 170 440 C 212 402 232 352 288 320 C 332 294 352 252 392 236 C 432 220 468 236 500 256 C 536 278 560 272 585 246 C 600 230 602 236 598 258 C 592 300 560 326 528 350 C 492 376 472 398 456 424 C 432 462 380 472 330 466 C 284 461 240 466 206 456 C 186 450 176 446 170 440 "
               />
 
               <path
                 class="map-water"
-                d="
-                  M 468 374
-                  C 482 354 514 350 540 360
-                  C 564 370 576 390 566 408
-                  C 552 432 518 440 488 430
-                  C 464 422 450 400 456 384
-                  C 460 376 462 378 468 374
-                  Z
-                "
+                d=" M 468 374 C 482 354 514 350 540 360 C 564 370 576 390 566 408 C 552 432 518 440 488 430 C 464 422 450 400 456 384 C 460 376 462 378 468 374 Z "
               />
               <path
                 class="map-water-highlight"
-                d="
-                  M 482 380
-                  C 496 370 520 370 534 378
-                  C 542 382 546 392 536 398
-                  C 522 408 500 408 488 398
-                  C 480 392 476 386 482 380
-                  Z
-                "
+                d=" M 482 380 C 496 370 520 370 534 378 C 542 382 546 392 536 398 C 522 408 500 408 488 398 C 480 392 476 386 482 380 Z "
               />
 
               <g class="map-ornaments" aria-hidden="true">
@@ -159,7 +104,6 @@
                   />
                 </g>
               </g>
-
 
               <g
                 class="menu-point menu-point--make"
@@ -238,34 +182,34 @@
       </div>
 
       <section class="gateway">
-      <header class="gateway-header">
-        <h3>서비스 바로가기</h3>
-        <p>업데이트된 공지와 결제 관리를 빠르게 확인해 보세요.</p>
-      </header>
-      <div class="gateway-grid">
-        <article class="gateway-card gateway-card--notice">
-          <div class="card-body">
-            <h4>공지사항 센터</h4>
-            <p>운영팀에서 전하는 최신 소식, 서비스 공지, 점검 안내를 한곳에서 확인할 수 있어요.</p>
-          </div>
-          <footer>
-            <button class="card-btn" type="button" @click="goNotice">
-              공지사항 바로가기
-            </button>
-          </footer>
-        </article>
-        <article class="gateway-card gateway-card--payment">
-          <div class="card-body">
-            <h4>결제 수단 관리</h4>
-            <p>등록된 카드와 계좌를 손쉽게 관리하고, 결제 이력을 확인할 수 있도록 준비 중이에요.</p>
-          </div>
-          <footer>
-            <button class="card-btn" type="button" @click="goPayment">
-              결제 관리 준비 알림
-            </button>
-          </footer>
-        </article>
-      </div>
+        <header class="gateway-header">
+          <h3>서비스 바로가기</h3>
+          <p>업데이트된 공지와 결제 관리를 빠르게 확인해 보세요.</p>
+        </header>
+        <div class="gateway-grid">
+          <article class="gateway-card gateway-card--notice">
+            <div class="card-body">
+              <h4>공지사항 센터</h4>
+              <p>운영팀에서 전하는 최신 소식, 서비스 공지, 점검 안내를 한곳에서 확인할 수 있어요.</p>
+            </div>
+            <footer>
+              <button class="card-btn" type="button" @click="goNotice">
+                공지사항 바로가기
+              </button>
+            </footer>
+          </article>
+          <article class="gateway-card gateway-card--payment">
+            <div class="card-body">
+              <h4>결제 수단 관리</h4>
+              <p>등록된 카드와 계좌를 손쉽게 관리하고, 결제 이력을 확인할 수 있도록 준비 중이에요.</p>
+            </div>
+            <footer>
+              <button class="card-btn" type="button" @click="goPayment">
+                결제 관리 준비 알림
+              </button>
+            </footer>
+          </article>
+        </div>
       </section>
     </div>
   </section>
@@ -283,21 +227,11 @@ import { notices } from '@/components/notices'
 
 const router = useRouter()
 
-function goCreate() {
-  router.push({ name: 'create-room' })
-}
-function goSearch() {
-  router.push({ name: 'find-room' })
-}
-function goMyRooms() {
-  router.push({ name: 'my-rooms' })
-}
-function goNotice() {
-  router.push({ name: 'notice' })
-}
-function goPayment() {
-  router.push({ name: 'payment-methods' })
-}
+function goCreate() { router.push({ name: 'create-room' }) }
+function goSearch() { router.push({ name: 'find-room' }) }
+function goMyRooms() { router.push({ name: 'my-rooms' }) }
+function goNotice() { router.push({ name: 'notice' }) }
+function goPayment() { router.push({ name: 'payment-methods' }) }
 
 const latestNotice = computed(() => {
   if (!notices.length) return null
@@ -313,24 +247,23 @@ function goLatestNotice() {
 </script>
 
 <style scoped>
-
 .main {
   min-height: calc(100dvh - var(--tab-h));
   padding-bottom: 0;
-  background: #3a2e20;
+  background: #fff7e1;
 }
 
 .hero {
   position: relative;
   width: 100%;
-  min-height: clamp(880px, 135dvh, 1600px);
-  padding: clamp(36px, 6vh, 84px) 0 clamp(110px, 8vh, 180px);
+  /* ⬇️ 갈색 여백 줄이기: 최소 높이/하단 패딩 축소 */
+  min-height: clamp(640px, 92dvh, 1100px);
+  padding: clamp(24px, 4vh, 60px) 0 clamp(16px, 4vh, 36px);
   overflow: hidden;
-  background-color: #3a2e20;
-
+  background: #fff7e1;
   background-size: cover;
   background-position: center top;
-  background-attachment: fixed;
+  background-attachment: fixed; /* 필요 없으면 주석 처리해도 됨 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -350,8 +283,8 @@ function goLatestNotice() {
   gap: clamp(16px, 3vw, 28px);
   padding: clamp(18px, 3vw, 28px);
   border-radius: 36px;
-  background: #f9f6eb;
-  box-shadow: 0 36px 72px rgba(8, 6, 3, 0.32);
+  background: #fffdf6;
+  border: 1px solid rgba(250, 204, 21, 0.45);
   z-index: 0;
   margin-bottom: clamp(12px, 2vh, 24px);
 }
@@ -362,7 +295,7 @@ function goLatestNotice() {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 12px;
-  color: #3b352c;
+  color: #3b2600;
 }
 .board-header h2 {
   margin: 0;
@@ -374,7 +307,7 @@ function goLatestNotice() {
   font-size: clamp(12px, 2vw, 14px);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(59, 53, 44, 0.7);
+  color: rgba(58, 32, 0, 0.6);
 }
 .board-body {
   position: relative;
@@ -382,6 +315,7 @@ function goLatestNotice() {
   width: 100%;
   aspect-ratio: 800 / 520;
   border-radius: 24px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
   overflow: hidden;
 }
 .map-svg {
@@ -390,67 +324,19 @@ function goLatestNotice() {
   display: block;
 }
 
-.map-land {
-  fill: url(#map-land);
-  stroke: rgba(64, 108, 55, 0.3);
-  stroke-width: 8;
-  stroke-linejoin: round;
-}
-.map-shadow {
-  fill: url(#map-shadow);
-}
-.map-border {
-  fill: none;
-  stroke: rgba(38, 72, 39, 0.35);
-  stroke-width: 10;
-  stroke-linejoin: round;
-}
-.map-trail {
-  fill: none;
-  stroke: #f6f2e8;
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
-}
-.map-water {
-  fill: url(#map-water);
-  stroke: #4fa1c7;
-  stroke-width: 3;
-  opacity: 1;
-}
-.map-water-highlight {
-  fill: rgba(255, 255, 255, 0.28);
-  stroke: none;
-  filter: blur(0.5px);
-}
-.map-ornaments {
-  fill: none;
-  pointer-events: none;
-}
-.map-pebble {
-  fill: #d9cec0;
-  stroke: rgba(64, 49, 32, 0.35);
-  stroke-width: 2;
-}
-.map-house-image {
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
-}
-.menu-point {
-  cursor: pointer;
-}
-.menu-logo {
-  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-.menu-point:hover .menu-logo {
-  transform: translateY(-4px);
-  filter: drop-shadow(0 22px 32px rgba(0, 0, 0, 0.4));
-}
-.menu-point:focus-visible .menu-logo {
-  transform: translateY(-4px) scale(1.02);
-  filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.45));
-}
+.map-land { fill: url(#map-land); stroke: rgba(64,108,55,.3); stroke-width: 8; stroke-linejoin: round; }
+.map-shadow { fill: url(#map-shadow); }
+.map-border { fill: none; stroke: rgba(38,72,39,.35); stroke-width: 10; stroke-linejoin: round; }
+.map-trail { fill: none; stroke: #f6f2e8; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 3px 6px rgba(0,0,0,.15)); }
+.map-water { fill: url(#map-water); stroke: #4fa1c7; stroke-width: 3; opacity: 1; }
+.map-water-highlight { fill: rgba(255,255,255,.28); stroke: none; filter: blur(.5px); }
+.map-ornaments { fill: none; pointer-events: none; }
+.map-pebble { fill: #d9cec0; stroke: rgba(64,49,32,.35); stroke-width: 2; }
+.map-house-image { filter: drop-shadow(0 6px 12px rgba(0,0,0,.3)); }
+.menu-point { cursor: pointer; }
+.menu-logo { filter: drop-shadow(0 16px 28px rgba(0,0,0,.35)); transition: transform .2s ease, filter .2s ease; }
+.menu-point:hover .menu-logo { transform: translateY(-4px); filter: drop-shadow(0 22px 32px rgba(0,0,0,.4)); }
+.menu-point:focus-visible .menu-logo { transform: translateY(-4px) scale(1.02); filter: drop-shadow(0 24px 36px rgba(0,0,0,.45)); }
 
 .legend {
   position: relative;
@@ -469,200 +355,93 @@ function goLatestNotice() {
   align-items: center;
   gap: 10px;
   padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 18px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.22);
   backdrop-filter: blur(2px);
 }
-.legend-logo {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-}
-.legend--menus span:last-child {
-  font-weight: 600;
-  color: #3b342c;
-}
+.legend-logo { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,.2)); }
+.legend--menus span:last-child { font-weight: 600; color: #a16207; }
 
 .gateway {
-  width: min(96%, 980px);
-  margin: clamp(0px, 1.6vh, 18px) auto 0;
+  width: min(94%, 940px);
+  margin: clamp(0px, 1vh, 10px) auto clamp(0px, 1vh, 10px);
   padding: 0 clamp(18px, 6vw, 32px);
   display: grid;
-  gap: clamp(20px, 3vw, 28px);
+  gap: clamp(16px, 2.5vw, 24px);
 }
-.gateway-header {
-  text-align: center;
-  color: #f8f4ec;
-}
-.gateway-header h3 {
-  margin: 0 0 8px;
-  font-size: clamp(20px, 4vw, 26px);
-  font-weight: 700;
-}
-.gateway-header p {
-  margin: 0;
-  font-size: clamp(13px, 3vw, 15px);
-  color: rgba(255, 244, 220, 0.75);
-}
-.gateway-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: clamp(18px, 3vw, 26px);
-}
+.gateway-header { text-align: center; color: #7c2d12; }
+.gateway-header h3 { margin: 0 0 8px; font-size: clamp(20px, 4vw, 26px); font-weight: 700; }
+.gateway-header p { margin: 0; font-size: clamp(13px, 3vw, 15px); color: rgba(122, 45, 18, 0.7); }
+.gateway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: clamp(18px,3vw,26px); }
 .gateway-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: clamp(22px, 4vw, 30px);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(120, 92, 68, 0.14);
-  box-shadow: 0 24px 48px rgba(20, 12, 6, 0.25);
-  backdrop-filter: blur(8px);
-  transform: translateY(0);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  position: relative; display: flex; flex-direction: column; gap: 22px;
+  padding: clamp(22px, 4vw, 30px); border-radius: 24px; background: #fff;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  backdrop-filter: blur(8px); transform: translateY(0); transition: transform .22s ease, background .22s ease;
 }
-.gateway-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 32px 58px rgba(20, 12, 6, 0.28);
-}
-.gateway-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 24px;
-  background: var(--card-accent, transparent);
-  opacity: 0.18;
-  pointer-events: none;
-}
-.gateway-card--notice,
-.gateway-card--payment {
-  --card-accent: linear-gradient(135deg, rgba(126, 192, 255, 0.4), rgba(167, 219, 255, 0.2));
-}
-.gateway-card h4 {
-  margin: 0 0 12px;
-  font-size: 18px;
-  color: #2f241b;
-}
-.gateway-card p {
-  margin: 0;
-  line-height: 1.6;
-  color: #6d6257;
-  font-size: 14px;
-}
+.gateway-card:hover { transform: translateY(-6px); background: #fffdf6; }
+.gateway-card::after { content:''; position:absolute; inset:0; border-radius:24px; background: transparent; opacity:.16; pointer-events:none; }
+.gateway-card--notice, .gateway-card--payment { --card-accent: transparent; }
+.gateway-card h4 { margin: 0 0 12px; font-size: 18px; color:#7c2d12; }
+.gateway-card p { margin:0; line-height:1.6; color:#a16207; font-size:14px; }
 .card-btn {
-  align-self: flex-start;
-  padding: 10px 18px;
-  border-radius: 12px;
-  border: none;
-  background: #2f241b;
-  color: #fff6e8;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  align-self:flex-start; padding:10px 18px; border-radius:999px; border:1px solid transparent; background:#fbbf24; color:#7c2d12;
+  font-size:14px; font-weight:700; cursor:pointer; transition: transform .18s ease, background .18s ease, color .18s ease;
 }
-.card-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(20, 12, 6, 0.25);
-  background: #433323;
-}
+.card-btn:hover { transform: translateY(-2px); background:#fcd34d; color:#5c1b0a; }
+
 .notice-banner {
   width: min(92%, 980px);
-  margin: clamp(-48px, -6vh, -24px) auto clamp(10px, 2vh, 20px);
+  margin: clamp(-64px, -8vh, -28px) auto clamp(6px, 1.5vh, 16px);
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 18px 32px rgba(8, 4, 0, 0.28);
+  border: 1px solid rgba(250,204,21,.4);
+  background: rgba(255,255,255,.8);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform .2s ease, box-shadow .2s ease;
   position: relative;
   z-index: 2;
 }
 .notice-banner:focus-visible {
   outline: none;
-  box-shadow:
-    0 20px 38px rgba(8, 4, 0, 0.32),
-    0 0 0 3px rgba(255, 255, 255, 0.4);
   transform: translateY(-1px);
 }
 .notice-banner:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 24px 44px rgba(8, 4, 0, 0.34),
-    0 0 0 1px rgba(255, 255, 255, 0.16);
 }
 .notice-banner__glass {
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 2vw, 16px);
-  padding: clamp(6px, 2vw, 10px) clamp(14px, 3vw, 22px);
+  display:flex; align-items:center; gap: clamp(8px,2vw,16px);
+  padding: clamp(6px,2vw,10px) clamp(14px,3vw,22px);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(16px);
-  color: #fff6eb;
+  background: rgba(255, 247, 231, 0.9);
+  backdrop-filter: blur(10px);
+  color:#a16207;
 }
 .notice-banner__label {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(59, 130, 246, 0.4);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #e5f2ff;
+  display:inline-flex; align-items:center; padding:6px 16px; border-radius:999px;
+  background: rgba(251, 191, 36, 0.9); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#4a1d05;
 }
-.notice-banner__marquee {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-  height: 20px;
-}
+.notice-banner__marquee { position: relative; flex:1; overflow: hidden; height:20px; }
 .notice-banner__track {
-  display: inline-block;
-  min-width: 100%;
-  white-space: nowrap;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 247, 233, 0.9);
-  padding-left: 100%;
-  animation: notice-marquee 18s linear infinite;
-  will-change: transform;
+  display:inline-block; min-width:100%; white-space:nowrap; font-size:14px; font-weight:600; color: #7c2d12;
+  padding-left:100%; animation: notice-marquee 18s linear infinite; will-change: transform;
 }
 
 @media (min-width: 1024px) {
-  .hero {
-    padding-top: clamp(72px, 9vh, 124px);
-  }
-  .notice-banner {
-    margin: clamp(-32px, -4vh, -18px) auto clamp(14px, 2.2vh, 26px);
-  }
-  .map-board {
-    margin-bottom: clamp(20px, 3vh, 36px);
-  }
-  .gateway {
-    margin: clamp(16px, 2.6vh, 32px) auto 0;
-  }
+  .hero { padding-top: clamp(36px, 6vh, 96px); }
+  .notice-banner { margin: clamp(-48px, -7vh, -20px) auto clamp(10px, 1.8vh, 22px); }
+  .map-board { margin-bottom: clamp(20px, 3vh, 36px); }
+  .gateway { margin: clamp(16px, 2.6vh, 32px) auto 0; }
 }
 
 @keyframes notice-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
 }
 
 @media (max-width: 820px) {
-  .map-board {
-    margin-bottom: clamp(32px, 6vh, 70px);
-  }
+  /* ⬇️ 지도 섹션 아래 간격 축소 */
+  .map-board { margin-bottom: clamp(16px, 3vh, 36px); }
   .notice-banner {
     width: min(96%, 860px);
     margin: 0 auto clamp(24px, 4vh, 36px);
@@ -670,32 +449,13 @@ function goLatestNotice() {
 }
 
 @media (max-width: 600px) {
-  .hero {
-    padding-bottom: 240px;
-  }
-  .map-board {
-    gap: 14px;
-    padding: 18px;
-    border-radius: 26px;
-  }
-  .board-body {
-    border-radius: 20px;
-  }
-  .info-panel {
-    width: calc(100% - 32px);
-  }
-  .notice-banner__glass {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-    gap: 6px;
-  }
-  .notice-banner__label {
-    justify-content: center;
-    width: 100%;
-  }
-  .notice-banner__marquee {
-    width: 100%;
-  }
+  /* ⬇️ 과도한 하단 패딩 제거 */
+  .hero { padding-bottom: clamp(16px, 4vh, 56px); }
+  .map-board { gap: 14px; padding: 18px; border-radius: 26px; }
+  .board-body { border-radius: 20px; }
+  .info-panel { width: calc(100% - 32px); }
+  .notice-banner__glass { flex-direction: column; align-items: stretch; text-align: center; gap: 6px; }
+  .notice-banner__label { justify-content: center; width: 100%; }
+  .notice-banner__marquee { width: 100%; }
 }
 </style>

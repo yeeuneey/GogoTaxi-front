@@ -1,5 +1,5 @@
-﻿<template>
-  <section class="detail">
+<template>
+  <section v-if="notice" class="detail">
     <header class="detail__header">
       <button class="detail__back" type="button" @click="goBack">목록으로</button>
       <span class="detail__badge" :class="`badge--${notice.type}`">
@@ -14,6 +14,12 @@
         {{ paragraph }}
       </p>
     </article>
+  </section>
+  <section v-else class="detail detail--empty">
+    <header class="detail__header">
+      <h1>공지사항을 찾을 수 없어요.</h1>
+      <button class="detail__back" type="button" @click="goBack">← 목록으로</button>
+    </header>
   </section>
 </template>
 
@@ -136,5 +142,12 @@ function goBack() {
   color: #4f4338;
   line-height: 1.8;
   font-size: 16px;
+}
+.detail--empty {
+  align-content: center;
+  text-align: center;
+}
+.detail--empty .detail__header {
+  justify-items: center;
 }
 </style>

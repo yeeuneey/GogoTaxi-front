@@ -4,10 +4,14 @@ export type User = {
   id: string
   name: string
   password: string
+  phone: string
+  birthDate: string
   gender: 'M' | 'F' | ''
   sms: boolean
   terms: boolean
 }
+
+export type AuthProfile = Pick<User, 'id' | 'name'>
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 
@@ -38,14 +42,32 @@ function getStorage(): StorageLike {
   return memoryStorage
 }
 
-// 초기 목업 데이터를 한 번만 채워 넣습니다.
+// 초기 목업 데이터는 한 번만 채워 둡니다.
 ;(function seedMockUsers() {
   const storage = getStorage()
   if (storage.getItem(USERS_KEY)) return
 
   const mock: User[] = [
-    { id: 'test1', name: '테스터', password: '1111', gender: 'M', sms: false, terms: true },
-    { id: 'kim', name: '김고고', password: '1234', gender: 'F', sms: true, terms: true },
+    {
+      id: 'test1',
+      name: '홍길동',
+      password: '1111',
+      phone: '01000000000',
+      birthDate: '1990-01-01',
+      gender: 'M',
+      sms: false,
+      terms: true,
+    },
+    {
+      id: 'kim',
+      name: '김철수',
+      password: '1234',
+      phone: '01012345678',
+      birthDate: '1995-05-12',
+      gender: 'F',
+      sms: true,
+      terms: true,
+    },
   ]
   storage.setItem(USERS_KEY, JSON.stringify(mock))
 })()
@@ -110,21 +132,39 @@ export function logout() {
   storage.removeItem(CURRENT_KEY)
 }
 
+export function getCurrentUser(): AuthProfile | null {
+  const storage = getStorage()
+  const raw = storage.getItem(CURRENT_KEY) ?? storage.getItem('gogotaxi_user')
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as Partial<User>
+    if (!parsed || (!parsed.id && parsed.id !== 0)) return null
+    const id =
+      typeof parsed.id === 'string'
+        ? parsed.id
+        : typeof parsed.id === 'number'
+          ? String(parsed.id)
+          : null
+    if (!id) return null
+    const name = typeof parsed.name === 'string' && parsed.name.trim() ? parsed.name : id
+    return { id, name }
+  } catch {
+    return null
+  }
+}
+
 export function isAuthed() {
   const storage = getStorage()
   return Boolean(storage.getItem(TOKEN_KEY))
 }
 
-export function updateUserPassword(id: string, nextPassword: string) {
+export function updateUserPassword(id: string, nextPassword: string): Pick<User, 'id' | 'name'> {
   const users = loadUsers()
 
-  // 인덱스 대신 객체로 존재 보장
   const target = users.find(u => u.id === id)
   if (!target) throw new Error('존재하지 않는 아이디입니다.')
 
-  const updatedUsers = users.map(u =>
-    u.id === id ? { ...u, password: nextPassword } as User : u
-  )
+  const updatedUsers = users.map(u => (u.id === id ? ({ ...u, password: nextPassword } as User) : u))
 
   saveUsers(updatedUsers)
 
@@ -161,7 +201,7 @@ export function socialLogin(
   if (index >= 0) {
     const existing = users[index]
     if (!existing) {
-      throw new Error('사용자 정보를 찾을 수 없습니다.')
+      throw new Error('알 수 없는 오류가 발생했습니다.')
     }
     user = existing
     if (!user.name && profile.name) {
@@ -174,6 +214,8 @@ export function socialLogin(
       id: profile.id,
       name: profile.name || `${provider} 사용자`,
       password: '',
+      phone: '',
+      birthDate: '',
       gender: '',
       sms: false,
       terms: false,
@@ -223,6 +265,8 @@ export function completeSocialOnboarding(params: {
   sms?: boolean
   name?: string
   gender?: User['gender']
+  phone?: string
+  birthDate?: string
 }) {
   if (!params.agreedTerms) {
     throw new Error('약관 동의가 필요합니다.')
@@ -230,7 +274,6 @@ export function completeSocialOnboarding(params: {
 
   const users = loadUsers()
 
-  // 인덱스 대신 객체로 존재 보장
   const existing = users.find(u => u.id === params.id)
   if (!existing) {
     throw new Error('사용자 정보를 찾을 수 없습니다.')
@@ -241,12 +284,12 @@ export function completeSocialOnboarding(params: {
     name: params.name?.trim() || existing.name,
     sms: params.sms ?? existing.sms,
     gender: params.gender ?? existing.gender,
+    phone: params.phone ?? existing.phone,
+    birthDate: params.birthDate ?? existing.birthDate,
     terms: true,
   }
 
-  const updatedUsers = users.map(user =>
-    user.id === params.id ? updated : user
-  )
+  const updatedUsers = users.map(user => (user.id === params.id ? updated : user))
   saveUsers(updatedUsers)
 
   const storage = getStorage()

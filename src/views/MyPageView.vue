@@ -1,21 +1,472 @@
 <template>
-  <section class="stub-page">
-    <h1>마이페이지 (임시화면)</h1>
-    <p>여기에 나중에 프로필, 설정 등 추가할 예정이에요.</p>
-  </section>
+  <div class="mypage-wrapper">
+    <div class="page-container">
+      <section class="profile-block">
+        <div class="avatar">
+          <img :src="profileImage" alt="profile image" />
+          <span v-if="genderIconSrc" class="avatar__badge">
+            <span class="sr-only">{{ genderIconAlt }}</span>
+            <img :src="genderIconSrc" alt="" aria-hidden="true" />
+          </span>
+        </div>
+        <div class="profile-info">
+          <span class="profile-name">{{ displayNickname }}</span>
+          <span class="profile-meta">{{ displayPhone }}</span>
+        </div>
+        <button type="button" class="edit-button" @click="openProfileSettings">
+          <span class="sr-only">{{ labels.openSettings }}</span>
+          <img :src="editIcon" alt="" class="edit-icon" aria-hidden="true" />
+        </button>
+      </section>
+
+      <section class="wallet-block">
+        <div class="wallet-brand">
+          <span class="wallet-brand-text">{{ labels.kokoPayBrand }}</span>
+          <div class="wallet-amount">
+            <span class="wallet-value">{{ displayBalance }}</span>
+            <span class="wallet-unit">{{ labels.currencyUnit }}</span>
+          </div>
+        </div>
+        <div class="wallet-actions">
+          <button type="button" class="wallet-link" @click="chargeWallet">
+            {{ labels.charge }}
+          </button>
+        </div>
+      </section>
+
+      <section class="menu-block">
+        <h2 class="menu-title">{{ labels.quickMenu }}</h2>
+        <nav class="menu-list">
+          <button type="button" class="menu-item" @click="goTo('history')">
+            <span class="menu-label">{{ labels.history }}</span>
+            <span class="menu-arrow" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="menu-item" @click="goTo('payment')">
+            <span class="menu-label">{{ labels.payment }}</span>
+            <span class="menu-arrow" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="menu-item" @click="goTo('notice')">
+            <span class="menu-label">{{ labels.notice }}</span>
+            <span class="menu-arrow" aria-hidden="true">&rsaquo;</span>
+          </button>
+        </nav>
+      </section>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import editIcon from "@/assets/edit.svg";
+import profileImage from "@/assets/user.svg";
+import maleBadge from "@/assets/male.svg";
+import femaleBadge from "@/assets/female.svg";
+import { refreshUserBalance, useUserStore } from "@/stores/userStore";
+import { fetchMe } from "@/api/auth";
+
+const router = useRouter();
+
+const labels = {
+  quickMenu: "\uBC14\uB85C\uAC00\uAE30",
+  history: "\uC774\uC6A9 \uAE30\uB85D",
+  payment: "\uACB0\uC81C \uC218\uB2E8 \uAD00\uB9AC",
+  notice: "\uACF5\uC9C0\uC0AC\uD56D",
+  kokoPay: "\uAF2C\uAF2C\uD398\uC774",
+  kokoPayDescription: "\uD604\uC7AC \uBCF4\uC720 \uAE08\uC561",
+  kokoPayBrand: "pay",
+  currencyUnit: "\uC6D0",
+  charge: "\uCDA9\uC804",
+  noNickname: "\uB2C9\uB124\uC784 \uBBF8\uB4F1\uB85D",
+  noPhone: "\uC5F0\uB77D\uCC98 \uBBF8\uB4F1\uB85D",
+  openSettings: "\uD504\uB85C\uD544 \uC218\uC815 \uD398\uC774\uC9C0 \uC774\uB3D9",
+  maleBadge: "\uB0A8\uC131 \uD504\uB85C\uD544",
+  femaleBadge: "\uC5EC\uC131 \uD504\uB85C\uD544",
+};
+
+type GenderValue = "male" | "female" | "M" | "F" | "\uB0A8\uC131" | "\uC5EC\uC131" | "";
+
+const user = useUserStore();
+
+const displayNickname = computed(() => {
+  const nickname = user.nickname?.trim();
+  return nickname?.length ? nickname : labels.noNickname;
+});
+
+const formatPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (!digits) return "";
+  if (digits.length < 4) return digits;
+  if (digits.length < 8) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+};
+
+const displayPhone = computed(() => {
+  const phone = user.phone?.trim();
+  const formatted = phone ? formatPhone(phone) : "";
+  return formatted.length ? formatted : labels.noPhone;
+});
+
+const genderIconSrc = computed(() => {
+  const normalized = user.gender?.toString().trim().toLowerCase();
+  if (["female", "f", "\uc5ec\uc131"].includes(normalized)) return femaleBadge;
+  if (["male", "m", "\ub0a8\uc131"].includes(normalized)) return maleBadge;
+  return "";
+});
+
+const genderIconAlt = computed(() => {
+  const normalized = user.gender?.toString().trim().toLowerCase();
+  if (["female", "f", "\uc5ec\uc131"].includes(normalized)) return labels.femaleBadge;
+  if (["male", "m", "\ub0a8\uc131"].includes(normalized)) return labels.maleBadge;
+  return "";
+});
+
+const displayBalance = computed(() => {
+  const numericBalance = Number(user.balance) || 0;
+  return new Intl.NumberFormat("ko-KR").format(numericBalance);
+});
+
+const routeNameMap: Record<string, string> = {
+  history: "History",
+  payment: "payment-methods",
+  notice: "notice",
+};
+
+const goTo = (page: string) => {
+  const routeName = routeNameMap[page];
+  if (!routeName) return;
+  router.push({ name: routeName });
+};
+
+const openProfileSettings = () => {
+  router.push("/mypage/settings");
+};
+
+const loadProfile = async () => {
+  try {
+    const me = await fetchMe();
+    user.nickname = me.name || me.loginId || "";
+    user.phone = me.phone || "";
+    user.gender = (me.gender as GenderValue) || "";
+  } catch (err) {
+    console.error("Failed to load profile", err);
+    user.nickname = "";
+    user.phone = "";
+    user.gender = "";
+  }
+};
+
+onMounted(() => {
+  if (!user.isBalanceLoaded) {
+    refreshUserBalance().catch(() => {
+      // quietly ignore; could show toast later
+    });
+  }
+  loadProfile();
+});
+
+const chargeWallet = () => {
+  router.push("/mypage/charge");
+};
+</script>
 
 <style scoped>
-.stub-page {
+.mypage-wrapper {
+  min-height: max(
+    0px,
+    calc(100dvh - var(--header-h) - var(--tab-h) - var(--safe-bottom) - var(--browser-ui-bottom))
+  );
+  background: #fff7e1;
+  padding: clamp(28px, 6vw, 56px) clamp(18px, 5vw, 42px) calc(48px + var(--safe-bottom));
+  font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-container {
+  width: min(640px, 100%);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  gap: 1.75rem;
+}
+
+.profile-block {
+  display: flex;
+  align-items: center;
+  gap: 1.45rem;
+  padding: 1.55rem 1.5rem;
+  background: #fffdf6;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  border-radius: 28px;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.avatar__badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.avatar__badge img {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
+  min-height: 84px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 1.42rem;
+  font-weight: 700;
+  color: #2b2113;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.profile-meta {
+  font-size: 1rem;
+  color: #574f48;
+  line-height: 1.15;
+}
+
+.wallet-block {
+  background: #fdd651;
+  border-radius: 28px;
+  padding: 1.35rem 1.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.wallet-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.wallet-brand-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b2113;
+}
+
+.wallet-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.wallet-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #2b2113;
+}
+
+.wallet-unit {
+  font-size: 1rem;
+  color: #6c5f54;
+}
+
+.wallet-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wallet-link {
+  border: none;
+  background: #fdd651;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #2b2113;
+  padding: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.wallet-link:hover {
+  opacity: 0.8;
+}
+
+.wallet-link:focus-visible {
+  outline: 2px solid rgba(43, 33, 19, 0.4);
+  outline-offset: 3px;
+}
+
+.wallet-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.35);
+  display: inline-block;
+}
+
+.edit-button {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - var(--header-h) - var(--tab-h));
-  background: #f9f9f9;
-  color: #333;
-  text-align: center;
+  cursor: pointer;
+}
+
+.edit-button:focus-visible {
+  outline: 3px solid rgba(203, 128, 38, 0.4);
+  border-radius: 8px;
+  outline-offset: 3px;
+}
+
+.edit-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.18s ease;
+}
+
+.edit-button:hover .edit-icon {
+  transform: scale(1.05);
+}
+
+.menu-block {
+  background: #fffdf6;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  border-radius: 28px;
+  padding: 1.35rem 1.25rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.menu-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #3a3a40;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.menu-item {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  background: #fff7e1;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3b2600;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.menu-item:hover {
+  transform: translateY(-2px);
+}
+
+.menu-item:focus-visible {
+  outline: 3px solid rgba(203, 128, 38, 0.4);
+  outline-offset: 3px;
+}
+
+.menu-arrow {
+  font-size: 1.25rem;
+  color: #2f2f33;
+  margin-left: 0.75rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .avatar {
+    width: 64px;
+    height: 64px;
+    align-self: center;
+  }
+
+  .avatar__badge {
+    width: 24px;
+    height: 24px;
+    right: -3px;
+    bottom: -3px;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .profile-info {
+    min-height: auto;
+  }
+
+  .edit-button {
+    margin-left: 0;
+    align-self: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .mypage-wrapper {
+    padding: 4.5rem 2rem calc(4rem + var(--safe-bottom));
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+
+  .menu-item {
+    font-size: 1.05rem;
+  }
 }
 </style>

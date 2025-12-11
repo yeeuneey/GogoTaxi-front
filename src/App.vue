@@ -2,18 +2,15 @@
   <div id="app" class="app-shell">
     <AppHeader />
 
-    <main
-      class="app-content"
-      :style="hideBottomTab
-        ? { paddingBottom: '0', minHeight: 'calc(100dvh - var(--header-h))' }
-        : {}"
-    >
+    <main class="app-content" :style="contentStyle">
       <router-view />
     </main>
 
     <Teleport to="body">
       <BottomTab v-if="!hideBottomTab" />
     </Teleport>
+
+    <NotificationToast />
   </div>
 </template>
 
@@ -22,6 +19,8 @@ import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import BottomTab from '@/components/BottomTab.vue'
+import NotificationToast from '@/components/NotificationToast.vue'
+import { startNotificationPolling, stopNotificationPolling } from '@/stores/notificationStore'
 
 const route = useRoute()
 
@@ -29,36 +28,68 @@ const route = useRoute()
 const hideBottomTab = computed(() => Boolean(route.meta?.hideBottomNav))
 
 const VIEWPORT_VAR = '--browser-ui-bottom'
+const SAFE_TOP_VAR = '--safe-top'
 
 function updateBrowserUiOffset() {
   if (typeof window === 'undefined') return
   const vv = window.visualViewport
   const offset = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0
   document.documentElement.style.setProperty(VIEWPORT_VAR, `${offset}px`)
+  const safeTop = vv ? Math.max(0, vv.offsetTop) : 0
+  document.documentElement.style.setProperty(SAFE_TOP_VAR, `${safeTop}px`)
 }
 
 const handleViewportChange = () => updateBrowserUiOffset()
 
 onMounted(() => {
   updateBrowserUiOffset()
-  if (typeof window === 'undefined' || !window.visualViewport) return
+  if (typeof window === 'undefined') return
+  startNotificationPolling()
+  if (!window.visualViewport) return
   window.visualViewport.addEventListener('resize', handleViewportChange)
   window.visualViewport.addEventListener('scroll', handleViewportChange)
 })
 
 onBeforeUnmount(() => {
-  if (typeof window === 'undefined' || !window.visualViewport) return
-  window.visualViewport.removeEventListener('resize', handleViewportChange)
-  window.visualViewport.removeEventListener('scroll', handleViewportChange)
+  if (typeof window !== 'undefined' && window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', handleViewportChange)
+    window.visualViewport.removeEventListener('scroll', handleViewportChange)
+  }
+  stopNotificationPolling()
+})
+
+const lockContentScroll = computed(() => Boolean(route.meta?.lockScroll))
+const flushBottomTab = computed(() => Boolean(route.meta?.flushBottomNav))
+
+const contentStyle = computed(() => {
+  const style: Record<string, string> = {}
+  if (hideBottomTab.value) {
+    const viewportHeight = 'calc((var(--app-vh, 1vh) * 100) - var(--header-h))'
+    style.paddingBottom = '0'
+    style.minHeight = viewportHeight
+    style.height = viewportHeight
+  } else if (flushBottomTab.value) {
+    style.paddingBottom = '0'
+  }
+  if (lockContentScroll.value) {
+    style.overflow = 'hidden'
+    style.overflowY = 'hidden'
+    style.WebkitOverflowScrolling = 'auto'
+  }
+  return style
 })
 </script>
 
 <style>
 :root {
   --header-h: 56px;
-  --tab-h: 64px;
+  --tab-h: 72px;
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --browser-ui-bottom: 0px;
+  --header-bg: #fdd651;
+  --header-border: #f0b400;
+  --app-bg: #fff7e1;
 }
 * {
   box-sizing: border-box;
@@ -68,6 +99,7 @@ body,
 #app {
   min-height: 100%;
   margin: 0;
+  background-color: var(--app-bg, #fff7e1);
 }
 /* Hide default scrollbars but keep scrollability */
 ::-webkit-scrollbar {
@@ -77,17 +109,29 @@ html,
 body {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overscroll-behavior: none;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  background: var(--header-bg, #fdd651);
+  pointer-events: none;
+  z-index: 1000;
 }
 
 .app-shell {
   position: relative;
   min-height: 100%;
-  background: #3a2e20;
+  background: var(--app-bg, #fff7e1);
 }
 .app-content {
-  padding-top: var(--header-h);
+  padding-top: calc(var(--header-h) + var(--safe-top));
   padding-bottom: calc(var(--tab-h) + var(--safe-bottom) + var(--browser-ui-bottom)); /* spacing when tab is visible */
-  min-height: calc(100dvh - var(--header-h));
+  min-height: calc(100dvh - (var(--header-h) + var(--safe-top)));
 }
 </style>
-
